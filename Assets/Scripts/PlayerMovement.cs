@@ -11,7 +11,7 @@ public class PlayerMovement : MonoBehaviour
 
     private CameraMovement cam;
 
-    private float speed = 100.0f;
+    private float speed = 40.0f;
     private Vector3 direction = Vector3.zero;
     private Vector3 jumpForce = Vector3.zero;
 
@@ -114,7 +114,7 @@ public class PlayerMovement : MonoBehaviour
         if (Physics.SphereCast(oldPosition, sphereCollider.radius, movement.normalized, out hit, movement.magnitude * Time.deltaTime, collisionLayer))
         {
             transform.position = oldPosition + movement.normalized * hit.distance;
-            transform.position += hit.normal * 0.002f;
+            transform.position += hit.normal * 0.01f;
             velocity -= hit.normal * Vector3.Dot(velocity, hit.normal);
             oldPosition = transform.position;
             CollisionDetectionAndResolution(velocity, depth + 1);
