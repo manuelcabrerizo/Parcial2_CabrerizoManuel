@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d8c22b5d7fe3c744b9bbbcb0a3b1ce12
+timeCreated: 1529656853
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 10541
+  packageName: Wizard
+  packageVersion: 1.5
+  assetPath: Assets/Fantasy Series Wizard/Materials/FX Glow Green.mat
+  uploadId: 252395

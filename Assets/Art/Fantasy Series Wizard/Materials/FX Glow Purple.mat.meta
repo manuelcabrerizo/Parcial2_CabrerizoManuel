@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: dfc44ea2757cc8d40b37594e2fc1d58f
+timeCreated: 1529657071
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 10541
+  packageName: Wizard
+  packageVersion: 1.5
+  assetPath: Assets/Fantasy Series Wizard/Materials/FX Glow Purple.mat
+  uploadId: 252395
