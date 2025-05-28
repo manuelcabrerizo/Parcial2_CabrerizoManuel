@@ -5,27 +5,26 @@ public class PlayerMovement : MonoBehaviour
 {
     public static event Action<PlayerMovement> onPlayerCreated;
 
-    [SerializeField] LayerMask collisionLayer;
     private Animator animator;
-    private SphereCollider sphereCollider;
+    private Rigidbody rb;
 
     private CameraMovement cam;
 
     private float speed = 40.0f;
     private Vector3 direction = Vector3.zero;
-    private Vector3 jumpForce = Vector3.zero;
+    private bool isGrounded = false;
 
     private Vector3 forceAccumulator = Vector3.zero;
     private Vector3 acceleration = Vector3.zero;
     private Vector3 velocity = Vector3.zero;
     private float damping = 0.01f;
 
-    private Vector3 oldPosition;
+
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
-        sphereCollider = GetComponent<SphereCollider>();
+        rb = GetComponent<Rigidbody>();
         CameraMovement.onCameraCreate += OnCameraCreate;
     }
 
@@ -68,11 +67,10 @@ public class PlayerMovement : MonoBehaviour
         {
             direction -= right;
         }
-
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
             velocity.y = 0.0f;
-            velocity += new Vector3(0.0f, 9.8f * 1.5f, 0.0f);
+            velocity += new Vector3(0.0f, 9.8f * 2.5f, 0.0f);
         }
 
         if (direction.sqrMagnitude > 0.0f)
@@ -81,44 +79,25 @@ public class PlayerMovement : MonoBehaviour
         }
         acceleration = direction * speed;
 
-
         Vector3 lastFrameAcceleration = acceleration;
         lastFrameAcceleration += forceAccumulator;
 
         velocity += lastFrameAcceleration * Time.deltaTime;
-
-        oldPosition = transform.position;
-        transform.position += velocity * Time.deltaTime;
-
-        CollisionDetectionAndResolution(velocity, 0);
-
         velocity *= Mathf.Pow(damping, Time.deltaTime);
 
+        Ray groundRay = new Ray(rb.position, Vector3.up * -1.0f);
+        isGrounded = Physics.Raycast(groundRay, 0.501f);
+
+        rb.velocity = velocity;
+
         transform.rotation = Quaternion.Euler(0.0f, cam.GetYaw(), 0.0f);
-
-
 
         animator.SetFloat("VelocityZ", Vector3.Dot(velocity, forward));
         animator.SetFloat("VelocityX", Vector3.Dot(velocity, right));
         forceAccumulator = Vector3.zero;
-    }
 
-    private void CollisionDetectionAndResolution(Vector3 movement, int depth)
-    {
-        if (depth >= 5)
-        {
-            return;
-        }
 
-        RaycastHit hit;
-        if (Physics.SphereCast(oldPosition, sphereCollider.radius, movement.normalized, out hit, movement.magnitude * Time.deltaTime, collisionLayer))
-        {
-            transform.position = oldPosition + movement.normalized * hit.distance;
-            transform.position += hit.normal * 0.01f;
-            velocity -= hit.normal * Vector3.Dot(velocity, hit.normal);
-            oldPosition = transform.position;
-            CollisionDetectionAndResolution(velocity, depth + 1);
-        }
+ 
     }
 
     private void OnCameraCreate(CameraMovement cam)
