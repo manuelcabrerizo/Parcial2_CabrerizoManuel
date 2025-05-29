@@ -41,7 +41,10 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         // Apply gravity
-        forceAccumulator += new Vector3(0.0f, -9.8f*3.0f, 0.0f);
+        if (isGrounded == false)
+        {
+            forceAccumulator += new Vector3(0.0f, -9.8f * 3.0f, 0.0f);
+        }
 
         Vector3 forward = cam.transform.forward;
         forward.y = 0;
@@ -87,6 +90,7 @@ public class PlayerMovement : MonoBehaviour
 
         Ray groundRay = new Ray(rb.position, Vector3.up * -1.0f);
         isGrounded = Physics.Raycast(groundRay, 0.501f);
+
 
         rb.velocity = velocity;
 
