@@ -6,13 +6,14 @@ public class CameraMovement : MonoBehaviour
     public static event Action<CameraMovement> onCameraCreate;
 
     [SerializeField] private PlayerMovement player;
-    [SerializeField] [Range(-0.6f, 0.8f)] private float heightRatio = 0.25f; 
-    [SerializeField] [Range(0.1f, 20.0f)] private float distance = 10.0f;
+    [SerializeField][Range(-0.6f, 0.8f)] private float heightRatio = 0.25f;
+    [SerializeField][Range(0.1f, 20.0f)] private float distance = 10.0f;
     [SerializeField][Range(-10.0f, 10.0f)] private float xOffset = 0.0f;
     [SerializeField][Range(-10.0f, 10.0f)] private float yOffset = 0.0f;
 
     private float yaw = 0;
     private float currentHeightRatio;
+    private bool isAiming = false;
 
     private void Start()
     {
@@ -21,20 +22,28 @@ public class CameraMovement : MonoBehaviour
         onCameraCreate?.Invoke(this);
     }
 
-    private void LateUpdate()
+    private void Update()
+    {
+        FollowPlayer();
+    }
+
+    private void FollowPlayer()
     {
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = -Input.GetAxis("Mouse Y");
 
         yaw += mouseX * 1.0f;
 
+
         if (Input.GetMouseButton(0))
         {
             currentHeightRatio = Mathf.Clamp(currentHeightRatio + mouseY * 0.025f, -0.6f, 0.8f);
+            isAiming = true;
         }
-        else 
+        else
         {
             currentHeightRatio = Mathf.Lerp(currentHeightRatio, heightRatio, Time.deltaTime * 4.0f);
+            isAiming = false;
         }
 
         Vector3 direction = new Vector3(0.0f, 0.0f, -1.0f);
@@ -56,5 +65,10 @@ public class CameraMovement : MonoBehaviour
     public float GetYaw()
     {
         return yaw;
+    }
+
+    public bool IsAiming()
+    {
+        return isAiming;
     }
 }

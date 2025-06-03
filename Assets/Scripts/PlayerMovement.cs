@@ -5,10 +5,12 @@ public class PlayerMovement : MonoBehaviour
 {
     public static event Action<PlayerMovement> onPlayerCreated;
 
+    [SerializeField] private ParticleSystem aimParticleSystem;
     private Animator animator;
     private Rigidbody rb;
 
-    private CameraMovement cam;
+    private CameraMovement cameraMovement;
+    private Camera cam;
 
     private float speed = 40.0f;
     private Vector3 direction = Vector3.zero;
@@ -19,13 +21,18 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity = Vector3.zero;
     private float damping = 0.01f;
 
-
+    private float mousePosX = 0.0f;
+    private float mousePosY = 0.0f;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         CameraMovement.onCameraCreate += OnCameraCreate;
+
+        mousePosX = Screen.width / 2;
+        mousePosY = Screen.height / 2;
+
     }
 
     private void Start()
@@ -39,6 +46,31 @@ public class PlayerMovement : MonoBehaviour
     }
 
     private void Update()
+    {
+        ProcessMovement();
+        if (cameraMovement.IsAiming())
+        {
+            if (aimParticleSystem.isPlaying == false)
+            {
+                mousePosX = Screen.width / 2;
+                mousePosY = Screen.height / 2;
+                animator.SetBool("IsAiming", true);
+                aimParticleSystem.Play();
+            }
+            ProcessAiming();
+        }
+        else
+        {
+            if (aimParticleSystem.isPlaying == true)
+            {
+                aimParticleSystem.Clear();
+                aimParticleSystem.Stop();
+                animator.SetBool("IsAiming", false);
+            }
+        }
+    }
+
+    private void ProcessMovement()
     {
         // Apply gravity
         if (isGrounded == false)
@@ -91,22 +123,40 @@ public class PlayerMovement : MonoBehaviour
         Ray groundRay = new Ray(rb.position, Vector3.up * -1.0f);
         isGrounded = Physics.Raycast(groundRay, 0.501f);
 
-
         rb.velocity = velocity;
 
-        transform.rotation = Quaternion.Euler(0.0f, cam.GetYaw(), 0.0f);
+        transform.rotation = Quaternion.Euler(0.0f, cameraMovement.GetYaw(), 0.0f);
 
         animator.SetFloat("VelocityZ", Vector3.Dot(velocity, forward));
         animator.SetFloat("VelocityX", Vector3.Dot(velocity, right));
         forceAccumulator = Vector3.zero;
+    }
 
+    private void ProcessAiming()
+    {
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+        float mouseSpeed = 8.0f;
 
- 
+        Vector3 planePosition = cameraMovement.transform.position + cameraMovement.transform.forward * 4;
+        Vector3 planeNormal = -cameraMovement.transform.forward;
+        Plane aimingPlane = new Plane(planeNormal, planePosition);
+
+        mousePosX = Mathf.Clamp(mousePosX + mouseX * mouseSpeed, 0.0f, Screen.width);
+        mousePosY = Mathf.Clamp(mousePosY + mouseY * mouseSpeed, 0.0f, Screen.height);
+
+        Ray ray = cam.ScreenPointToRay(new Vector2(mousePosX, mousePosY));
+        float t;
+        if (aimingPlane.Raycast(ray, out t))
+        {
+            aimParticleSystem.transform.position = ray.origin + ray.direction * t;
+        }
     }
 
     private void OnCameraCreate(CameraMovement cam)
     {
-        this.cam = cam;
+        this.cameraMovement = cam;
+        this.cam = cameraMovement.GetComponent<Camera>();
     }
 
     public void ClearMovement()
