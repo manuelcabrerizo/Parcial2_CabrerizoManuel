@@ -50,6 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7bbc6637880adf447b879a0cb0c632f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  aimParticleSystem: {fileID: 6157448334857028917}
 --- !u!114 &3425086496103490843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106,7 +107,7 @@ Rigidbody:
     m_Bits: 0
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
-  m_UseGravity: 0
+  m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
@@ -5029,16 +5030,7 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 95485745221279966, guid: 94757f3db4d19b54880cb5a986990566, type: 3}
-      propertyPath: m_Controller
-      value: 
-      objectReference: {fileID: 9100000, guid: bd20028e944d24b41aa3adafc661600b, type: 2}
-    - target: {fileID: 199822900255684752, guid: 94757f3db4d19b54880cb5a986990566, type: 3}
-      propertyPath: m_Materials.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 95485745221279966, guid: 94757f3db4d19b54880cb5a986990566, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

@@ -33,6 +33,8 @@ public class PlayerAim : MonoBehaviour
         {
             if (aimParticleSystem.isPlaying == false)
             {
+                mousePosX = Screen.width / 2;
+                mousePosY = Screen.height / 2;
                 animator.SetBool("IsAiming", true);
                 aimParticleSystem.Play();
             }

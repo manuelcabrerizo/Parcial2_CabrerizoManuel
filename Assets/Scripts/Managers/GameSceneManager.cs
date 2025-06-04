@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class GameSceneManager : MonoBehaviourSingleton<GameSceneManager>
 {
     public static event Action onLoadingCompleted;
-    public static event Action<float> onLoadingBarChange;
+    //public static event Action<float> onLoadingBarChange;
 
     [SerializeField] private float maxTime;
     private IEnumerator loadingScene = null;
