@@ -1,11 +1,10 @@
 using System;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class EntityMovement : MonoBehaviour
 {
-    public static event Action<PlayerMovement> onPlayerCreated;
+    public static event Action<EntityMovement> onEntityCreated;
 
-    [SerializeField] private ParticleSystem aimParticleSystem;
     private Animator animator;
     private Rigidbody rb;
 
@@ -21,23 +20,17 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity = Vector3.zero;
     private float damping = 0.01f;
 
-    private float mousePosX = 0.0f;
-    private float mousePosY = 0.0f;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         CameraMovement.onCameraCreate += OnCameraCreate;
-
-        mousePosX = Screen.width / 2;
-        mousePosY = Screen.height / 2;
-
     }
 
     private void Start()
     {
-        onPlayerCreated?.Invoke(this);
+        onEntityCreated?.Invoke(this);
     }
 
     private void OnDestroy()
@@ -48,26 +41,6 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         ProcessMovement();
-        if (cameraMovement.IsAiming())
-        {
-            if (aimParticleSystem.isPlaying == false)
-            {
-                mousePosX = Screen.width / 2;
-                mousePosY = Screen.height / 2;
-                animator.SetBool("IsAiming", true);
-                aimParticleSystem.Play();
-            }
-            ProcessAiming();
-        }
-        else
-        {
-            if (aimParticleSystem.isPlaying == true)
-            {
-                aimParticleSystem.Clear();
-                aimParticleSystem.Stop();
-                animator.SetBool("IsAiming", false);
-            }
-        }
     }
 
     private void ProcessMovement()
@@ -121,36 +94,19 @@ public class PlayerMovement : MonoBehaviour
         velocity *= Mathf.Pow(damping, Time.deltaTime);
 
         Ray groundRay = new Ray(rb.position, Vector3.up * -1.0f);
-        isGrounded = Physics.Raycast(groundRay, 0.501f);
+        isGrounded = Physics.Raycast(groundRay, 0.75f);
 
         rb.velocity = velocity;
 
         transform.rotation = Quaternion.Euler(0.0f, cameraMovement.GetYaw(), 0.0f);
 
-        animator.SetFloat("VelocityZ", Vector3.Dot(velocity, forward));
-        animator.SetFloat("VelocityX", Vector3.Dot(velocity, right));
-        forceAccumulator = Vector3.zero;
-    }
-
-    private void ProcessAiming()
-    {
-        float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = Input.GetAxis("Mouse Y");
-        float mouseSpeed = 8.0f;
-
-        Vector3 planePosition = cameraMovement.transform.position + cameraMovement.transform.forward * 4;
-        Vector3 planeNormal = -cameraMovement.transform.forward;
-        Plane aimingPlane = new Plane(planeNormal, planePosition);
-
-        mousePosX = Mathf.Clamp(mousePosX + mouseX * mouseSpeed, 0.0f, Screen.width);
-        mousePosY = Mathf.Clamp(mousePosY + mouseY * mouseSpeed, 0.0f, Screen.height);
-
-        Ray ray = cam.ScreenPointToRay(new Vector2(mousePosX, mousePosY));
-        float t;
-        if (aimingPlane.Raycast(ray, out t))
+        if (animator != null)
         {
-            aimParticleSystem.transform.position = ray.origin + ray.direction * t;
+            animator.SetFloat("VelocityZ", Vector3.Dot(velocity, forward));
+            animator.SetFloat("VelocityX", Vector3.Dot(velocity, right));
         }
+
+        forceAccumulator = Vector3.zero;
     }
 
     private void OnCameraCreate(CameraMovement cam)

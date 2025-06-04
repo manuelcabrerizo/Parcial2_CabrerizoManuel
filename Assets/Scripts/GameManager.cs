@@ -1,16 +1,17 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
-    private PlayerMovement player = null;
+    private EntityMovement entity = null;
     private SceneReferences main = null;
     private SceneReferences current = null;
     private string currentLoadedSceneName;
 
     protected override void OnAwaken()
     {
-        PlayerMovement.onPlayerCreated += OnPlayerCreated;
+        EntityMovement.onEntityCreated += OnEntityCreated;
         SceneReferences.onLoaded += OnSceneReferencesLoaded;
         Portal.onPortalEnter += OnPortalEnter;
         Portal.onPortalToMainEnter += OnPortalToMainEnter;
@@ -18,15 +19,15 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     protected override void OnDestroyed()
     {
-        PlayerMovement.onPlayerCreated -= OnPlayerCreated;
+        EntityMovement.onEntityCreated -= OnEntityCreated;
         SceneReferences.onLoaded -= OnSceneReferencesLoaded;
         Portal.onPortalEnter -= OnPortalEnter;
         Portal.onPortalToMainEnter -= OnPortalToMainEnter;
     }
 
-    private void OnPlayerCreated(PlayerMovement player)
+    private void OnEntityCreated(EntityMovement entity)
     {
-        this.player = player;
+        this.entity = entity;
     }
 
     private void OnSceneReferencesLoaded(SceneReferences scene)
@@ -38,33 +39,41 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         else
         {
             current = scene;
-            player.transform.position = current.targetTransform.position;
-            player.transform.rotation = current.targetTransform.rotation;
+            entity.transform.position = current.targetTransform.position;
+            entity.transform.rotation = current.targetTransform.rotation;
         }
     }
 
-    private void OnPortalEnter(string sceneName, Transform exitTransform)
+    private void OnPortalEnter(GameObject go, string sceneName, Transform exitTransform)
     {
-        player.ClearMovement();
-        main.targetTransform = exitTransform;
-        GameSceneManager.onLoadingCompleted += OnSceneLoadingComplete;
-        currentLoadedSceneName = sceneName;
-        GameSceneManager.Instance.ChangeSceneTo(sceneName);
+        if (go == entity.gameObject)
+        {
+            entity.ClearMovement();
+            main.targetTransform = exitTransform;
+            GameSceneManager.onLoadingCompleted += OnSceneLoadingComplete;
+            currentLoadedSceneName = sceneName;
+            GameSceneManager.Instance.ChangeSceneTo(sceneName);
+        }
     }
 
-    private void OnPortalToMainEnter()
+    private void OnPortalToMainEnter(GameObject go)
     {
-        player.ClearMovement();
-        player.transform.position = main.targetTransform.position;
-        player.transform.rotation = main.targetTransform.rotation;
-        main.SetActiveGo(true);
-        GameSceneManager.onLoadingCompleted -= OnSceneLoadingComplete;
-        SceneManager.UnloadSceneAsync(currentLoadedSceneName);
+        if (go == entity.gameObject)
+        {
+            entity.ClearMovement();
+            entity.transform.position = main.targetTransform.position;
+            entity.transform.rotation = main.targetTransform.rotation;
+            main.SetActiveGo(true);
+            main.SetActiveControlables(true, entity.gameObject);
+            GameSceneManager.onLoadingCompleted -= OnSceneLoadingComplete;
+            SceneManager.UnloadSceneAsync(currentLoadedSceneName);
+        }
     }
 
     private void OnSceneLoadingComplete()
     {
         main.SetActiveGo(false);
+        main.SetActiveControlables(false, entity.gameObject);
     }
 
 }

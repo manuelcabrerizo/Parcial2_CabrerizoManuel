@@ -5,7 +5,6 @@ public class CameraMovement : MonoBehaviour
 {
     public static event Action<CameraMovement> onCameraCreate;
 
-    [SerializeField] private PlayerMovement player;
     [SerializeField][Range(-0.6f, 0.8f)] private float heightRatio = 0.25f;
     [SerializeField][Range(0.1f, 20.0f)] private float distance = 10.0f;
     [SerializeField][Range(-10.0f, 10.0f)] private float xOffset = 0.0f;
@@ -15,11 +14,23 @@ public class CameraMovement : MonoBehaviour
     private float currentHeightRatio;
     private bool isAiming = false;
 
+    private GameObject goTraget;
+
+
+    private void Awake()
+    {
+        EntityMovement.onEntityCreated += OnEntityCreated;
+    }
+
+    private void OnDestroy()
+    {
+        EntityMovement.onEntityCreated -= OnEntityCreated;
+    }
+
     private void Start()
     {
         currentHeightRatio = heightRatio;
         Cursor.lockState = CursorLockMode.Locked;
-        onCameraCreate?.Invoke(this);
     }
 
     private void Update()
@@ -29,6 +40,11 @@ public class CameraMovement : MonoBehaviour
 
     private void FollowPlayer()
     {
+        if (goTraget == null)
+        {
+            return;
+        }
+
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = -Input.GetAxis("Mouse Y");
 
@@ -50,9 +66,9 @@ public class CameraMovement : MonoBehaviour
         direction = Quaternion.AngleAxis(yaw, Vector3.up) * direction;
         direction.Normalize();
 
-        Vector3 target = player.transform.position + (direction + Vector3.up * currentHeightRatio).normalized * distance;
+        Vector3 target = goTraget.transform.position + (direction + Vector3.up * currentHeightRatio).normalized * distance;
 
-        Vector3 viewPosition = player.transform.position;
+        Vector3 viewPosition = goTraget.transform.position;
         target += Vector3.up * yOffset;
         target += transform.right * xOffset;
         viewPosition += Vector3.up * yOffset;
@@ -70,5 +86,11 @@ public class CameraMovement : MonoBehaviour
     public bool IsAiming()
     {
         return isAiming;
+    }
+
+    public void OnEntityCreated(EntityMovement entity)
+    {
+        goTraget = entity.gameObject;
+        onCameraCreate?.Invoke(this);
     }
 }

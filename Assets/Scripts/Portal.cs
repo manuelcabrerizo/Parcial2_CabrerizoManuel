@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class Portal : MonoBehaviour
 {
-    public static event Action<string, Transform> onPortalEnter;
-    public static event Action onPortalToMainEnter;
+    public static event Action<GameObject, string, Transform> onPortalEnter;
+    public static event Action<GameObject> onPortalToMainEnter;
 
     [SerializeField] private bool isPortalToMain;
     [SerializeField] private string sceneToLoadName;
@@ -14,11 +14,11 @@ public class Portal : MonoBehaviour
     {
         if (isPortalToMain)
         {
-            onPortalToMainEnter.Invoke();
+            onPortalToMainEnter.Invoke(other.gameObject);
         }
         else
         {
-            onPortalEnter?.Invoke(sceneToLoadName, exitTransform);
+            onPortalEnter?.Invoke(other.gameObject, sceneToLoadName, exitTransform);
         }
     }
 }
