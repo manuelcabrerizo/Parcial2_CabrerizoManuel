@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class PlayerAim : MonoBehaviour
 {
@@ -97,6 +96,7 @@ public class PlayerAim : MonoBehaviour
                 {
                     Controlable controlable;
                     Enemy enemy;
+                    CrateProjectile crate;
                     if (go.TryGetComponent<Controlable>(out controlable))
                     {
                         particleRenderer.material = controlMaterial;
@@ -104,6 +104,10 @@ public class PlayerAim : MonoBehaviour
                     else if (go.TryGetComponent<Enemy>(out enemy))
                     {
                         particleRenderer.material = attackMaterial;
+                    }
+                    else if (go.TryGetComponent<CrateProjectile>(out crate))
+                    {
+                        particleRenderer.material = controlMaterial;
                     }
                     else
                     {
@@ -127,6 +131,7 @@ public class PlayerAim : MonoBehaviour
                 {
                     Controlable controlable;
                     Enemy enemy;
+                    CrateProjectile crate;
                     if (go.TryGetComponent<Controlable>(out controlable))
                     {
                         spellParticleRenderer.material = controlMaterial;
@@ -143,6 +148,13 @@ public class PlayerAim : MonoBehaviour
                         spellParticleSystem.transform.position += Vector3.up * 1.0f;
                         spellParticleSystem.Play();
                         enemy.Attack();
+                    }
+                    else if (go.TryGetComponent<CrateProjectile>(out crate))
+                    {
+                        spellParticleRenderer.material = idleMaterial;
+                        spellParticleSystem.transform.position = crate.transform.position;
+                        spellParticleSystem.Play();
+                        crate.Lunch(crate.transform.position, crate.LaunchPosition, 1.0f);
                     }
                 }
             }

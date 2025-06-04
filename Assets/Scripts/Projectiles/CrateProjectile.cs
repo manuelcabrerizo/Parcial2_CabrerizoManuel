@@ -4,6 +4,9 @@ using UnityEngine;
 public class CrateProjectile : Projectile
 {
     private Rigidbody body;
+    private Vector3 launchPosition;
+
+    public Vector3 LaunchPosition => launchPosition;
 
     private void Awake()
     {
@@ -18,6 +21,8 @@ public class CrateProjectile : Projectile
     public void Lunch(Vector3 startPosition, Vector3 targetPosition, float timeToTarget)
     {
         StartCoroutine(Lifetime());
+
+        launchPosition = startPosition;
 
         body.position = startPosition;
         body.velocity = Vector3.zero;

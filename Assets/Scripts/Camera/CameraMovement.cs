@@ -1,4 +1,5 @@
 using System;
+using TMPro;
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
@@ -9,6 +10,7 @@ public class CameraMovement : MonoBehaviour
     [SerializeField][Range(0.1f, 20.0f)] private float distance = 10.0f;
     [SerializeField][Range(-10.0f, 10.0f)] private float xOffset = 0.0f;
     [SerializeField][Range(-10.0f, 10.0f)] private float yOffset = 0.0f;
+    [SerializeField] private LayerMask wallLayer;
 
     private float yaw = 0;
     private float currentHeightRatio;
@@ -73,6 +75,16 @@ public class CameraMovement : MonoBehaviour
         target += transform.right * xOffset;
         viewPosition += Vector3.up * yOffset;
         viewPosition += transform.right * xOffset;
+
+        Vector3 toTargte = target - viewPosition;
+        float magnitude = toTargte.magnitude;
+        toTargte.Normalize();
+
+        RaycastHit hitInfo;
+        if (Physics.SphereCast(viewPosition, 0.2f, toTargte, out hitInfo, magnitude, wallLayer))
+        {
+            target = viewPosition + toTargte * hitInfo.distance;
+        }
 
         transform.position = target;
         transform.LookAt(viewPosition);

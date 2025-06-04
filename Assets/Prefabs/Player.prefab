@@ -68,6 +68,9 @@ MonoBehaviour:
   idleMaterial: {fileID: 2100000, guid: fb2b30f0bbec4574ab947e423e2f73ce, type: 2}
   controlMaterial: {fileID: 2100000, guid: d8c22b5d7fe3c744b9bbbcb0a3b1ce12, type: 2}
   attackMaterial: {fileID: 2100000, guid: dfc44ea2757cc8d40b37594e2fc1d58f, type: 2}
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!135 &6068192678778021049
 SphereCollider:
   m_ObjectHideFlags: 0
