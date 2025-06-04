@@ -14,6 +14,7 @@ public class EntityMovement : MonoBehaviour
     private float speed = 40.0f;
     private Vector3 direction = Vector3.zero;
     private bool isGrounded = false;
+    private float maxAngleMovement = 30f;
 
     private Vector3 forceAccumulator = Vector3.zero;
     private Vector3 acceleration = Vector3.zero;
@@ -96,7 +97,14 @@ public class EntityMovement : MonoBehaviour
         Ray groundRay = new Ray(rb.position, Vector3.up * -1.0f);
         isGrounded = Physics.Raycast(groundRay, 0.75f);
 
-        rb.velocity = velocity;
+        if (CanMove(direction))
+        {
+            rb.velocity = velocity;
+        }
+        else
+        { 
+            rb.velocity = Vector3.zero;
+        }
 
         transform.rotation = Quaternion.Euler(0.0f, cameraMovement.GetYaw(), 0.0f);
 
@@ -107,6 +115,33 @@ public class EntityMovement : MonoBehaviour
         }
 
         forceAccumulator = Vector3.zero;
+    }
+
+    private bool CanMove(Vector3 moveDir)
+    {
+        Terrain terrain = Terrain.activeTerrain;
+        Vector3 relativePos = GetMapPos();
+        Vector3 normal = terrain.terrainData.GetInterpolatedNormal(relativePos.x, relativePos.z);
+        float angle = Vector3.Angle(normal, Vector3.up);
+
+        float currentHeight = terrain.SampleHeight(rb.position);
+        float nextHeight = terrain.SampleHeight(rb.position + moveDir * 5);
+        Debug.Log(angle);
+        if ((angle > maxAngleMovement) && (nextHeight > currentHeight))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private Vector3 GetMapPos()
+    {
+        Vector3 pos = rb.position;
+        Terrain terrain = Terrain.activeTerrain;
+
+        return new Vector3((pos.x - terrain.transform.position.x) / terrain.terrainData.size.x,
+                           0,
+                           (pos.z - terrain.transform.position.z) / terrain.terrainData.size.z);
     }
 
     private void OnCameraCreate(CameraMovement cam)
