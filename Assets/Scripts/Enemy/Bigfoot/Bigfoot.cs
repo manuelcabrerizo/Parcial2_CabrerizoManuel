@@ -6,9 +6,23 @@ public class Bigfoot : Enemy
     [SerializeField] private Transform hand;
     [SerializeField] private Transform target;
 
-    CrateProjectile holdingCrate = null;
+    private CrateProjectile holdingCrate = null;
+    private float attackRadioRatio;
 
     private void Update()
+    {
+        CalculateAttackRadioRatio();
+        FaceToTarget();
+        SetHoldingCratePosition();
+    }
+
+    private void CalculateAttackRadioRatio()
+    {
+        float distance = (target.position - transform.position).magnitude;
+        attackRadioRatio = Mathf.Min(distance / attackRadio, 1.0f); 
+    }
+
+    private void FaceToTarget()
     {
         Vector3 forward = transform.forward;
         forward.y = 0.0f;
@@ -19,16 +33,21 @@ public class Bigfoot : Enemy
         forward.y = 0.0f;
         forward.Normalize();
         Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
-        
+
         Quaternion newRotation = Quaternion.Slerp(currentRotation, targetRotation, Time.deltaTime * 2.0f);
         transform.rotation = newRotation;
+    }
 
+    private void SetHoldingCratePosition()
+    {
         if (holdingCrate != null)
         {
             holdingCrate.transform.position = hand.position;
             holdingCrate.transform.rotation = hand.rotation;
         }
     }
+
+
 
     private void OnDrawGizmos()
     {
@@ -45,7 +64,7 @@ public class Bigfoot : Enemy
 
     public void LunchCrate()
     {
-        holdingCrate.Lunch(holdingCrate.transform.position, target.position, 2.0f);
+        holdingCrate.Lunch(holdingCrate.transform.position, target.position, 2.0f - (2.0f * (1.0f - attackRadioRatio)));
         holdingCrate = null;
     }
 

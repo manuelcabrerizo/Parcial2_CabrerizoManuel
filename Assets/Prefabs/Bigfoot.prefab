@@ -71,7 +71,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   life: 20
-  attackRadio: 12
+  attackRadio: 30
   hand: {fileID: 1710726843308798490}
   target: {fileID: 0}
 --- !u!54 &8099416669579424493
