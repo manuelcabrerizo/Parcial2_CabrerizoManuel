@@ -76,6 +76,10 @@ public class EntityMovement : MonoBehaviour
         {
             direction -= right;
         }
+
+        Ray groundRay = new Ray(rb.position, Vector3.up * -1.0f);
+        isGrounded = Physics.Raycast(groundRay, 0.75f);
+
         if (isGrounded && Input.GetKeyDown(KeyCode.Space))
         {
             velocity.y = 0.0f;
@@ -88,24 +92,22 @@ public class EntityMovement : MonoBehaviour
         }
         acceleration = direction * speed;
 
-        Vector3 lastFrameAcceleration = acceleration;
-        lastFrameAcceleration += forceAccumulator;
+        Vector3 lastFrameAcceleration = Vector3.zero;
 
+        if (CanMove(direction) || !isGrounded)
+        {
+            lastFrameAcceleration = acceleration;
+        }
+        else
+        {
+            velocity = new Vector3(rb.velocity.x, 0.0f, rb.velocity.z);
+        }
+
+        lastFrameAcceleration += forceAccumulator;
         velocity += lastFrameAcceleration * Time.deltaTime;
         velocity *= Mathf.Pow(damping, Time.deltaTime);
 
-        Ray groundRay = new Ray(rb.position, Vector3.up * -1.0f);
-        isGrounded = Physics.Raycast(groundRay, 0.75f);
-
-        if (CanMove(direction))
-        {
-            rb.velocity = velocity;
-        }
-        else
-        { 
-            rb.velocity = Vector3.zero;
-        }
-
+        rb.velocity = velocity;
         transform.rotation = Quaternion.Euler(0.0f, cameraMovement.GetYaw(), 0.0f);
 
         if (animator != null)
