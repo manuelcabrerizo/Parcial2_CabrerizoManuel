@@ -1,11 +1,20 @@
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class PlayerAim : MonoBehaviour
 {
     [SerializeField] private ParticleSystem aimParticleSystem;
+    [SerializeField] private ParticleSystem spellParticleSystem;
+    [SerializeField] private Material idleMaterial;
+    [SerializeField] private Material controlMaterial;
+    [SerializeField] private Material attackMaterial;
+
     private float mousePosX = 0.0f;
     private float mousePosY = 0.0f;
+
     private Animator animator;
+    private ParticleSystemRenderer particleRenderer;
+    private ParticleSystemRenderer spellParticleRenderer;
 
     private Player player;
     private CameraMovement cameraMovement;
@@ -20,6 +29,10 @@ public class PlayerAim : MonoBehaviour
 
         mousePosX = Screen.width / 2;
         mousePosY = Screen.height / 2;
+
+        particleRenderer = aimParticleSystem.GetComponent<ParticleSystemRenderer>();
+        particleRenderer.material = idleMaterial;
+        spellParticleRenderer = spellParticleSystem.GetComponent<ParticleSystemRenderer>();
     }
 
     private void OnDestroy()
@@ -72,8 +85,36 @@ public class PlayerAim : MonoBehaviour
             {
                 aimParticleSystem.transform.position = ray.origin + ray.direction * t;
             }
+
+            // TODO: use layers for this check
+            Vector3 screenPoint = cam.WorldToScreenPoint(aimParticleSystem.transform.position);
+            Ray aimRay = cam.ScreenPointToRay(screenPoint);
+            RaycastHit hit;
+            if (Physics.Raycast(aimRay, out hit))
+            {
+                GameObject go = hit.collider.gameObject;
+                if (go != gameObject)
+                {
+                    Controlable controlable;
+                    Enemy enemy;
+                    if (go.TryGetComponent<Controlable>(out controlable))
+                    {
+                        particleRenderer.material = controlMaterial;
+                    }
+                    else if (go.TryGetComponent<Enemy>(out enemy))
+                    {
+                        particleRenderer.material = attackMaterial;
+                    }
+                    else
+                    {
+                        particleRenderer.material = idleMaterial;
+                    }
+                }
+            }
+
         }
         
+        // TODO: use layers for this
         if (Input.GetMouseButtonUp(0))
         {
             Vector3 screenPoint = cam.WorldToScreenPoint(aimParticleSystem.transform.position);
@@ -85,11 +126,23 @@ public class PlayerAim : MonoBehaviour
                 if (go != gameObject)
                 {
                     Controlable controlable;
+                    Enemy enemy;
                     if (go.TryGetComponent<Controlable>(out controlable))
                     {
+                        spellParticleRenderer.material = controlMaterial;
+                        spellParticleSystem.transform.position = controlable.transform.position;
+                        spellParticleSystem.transform.position += Vector3.up;
+                        spellParticleSystem.Play();
                         Destroy(GetComponent<EntityMovement>());
                         controlable.Control(player);
-                        
+                    }
+                    else if (go.TryGetComponent<Enemy>(out enemy))
+                    {
+                        spellParticleRenderer.material = attackMaterial;
+                        spellParticleSystem.transform.position = enemy.transform.position;
+                        spellParticleSystem.transform.position += Vector3.up * 1.0f;
+                        spellParticleSystem.Play();
+                        enemy.Attack();
                     }
                 }
             }

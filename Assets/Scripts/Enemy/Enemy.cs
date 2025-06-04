@@ -17,4 +17,9 @@ public class Enemy : MonoBehaviour
     protected virtual void OnAwaken() { }
 
     protected virtual void OnDestroyed() { }
+
+    public void Attack()
+    { 
+    
+    }
 }
