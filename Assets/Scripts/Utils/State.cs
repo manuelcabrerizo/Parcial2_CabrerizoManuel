@@ -1,16 +1,12 @@
 ﻿using UnityEngine;
 
-public class MonoBehaviourState : MonoBehaviour, IState
+public class State : IState
 {
     public virtual void OnEnter()
     {
     }
 
     public virtual void OnExit()
-    {
-    }
-
-    public virtual void OnFixedUpdate()
     {
     }
 

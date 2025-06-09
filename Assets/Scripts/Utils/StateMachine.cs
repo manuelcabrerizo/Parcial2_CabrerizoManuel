@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
-
 public class StateMachine
 {
     private Stack<IState> states;
@@ -60,6 +58,11 @@ public class StateMachine
         }
     }
 
+    public int Count()
+    {
+        return states.Count;
+    }
+
     public void Update()
     {
         if (states.Count == 0) return;
@@ -70,13 +73,4 @@ public class StateMachine
         }
     }
 
-    public void FixedUpdate()
-    {
-        if (states.Count == 0) return;
-        IState currentState = states.Peek();
-        if (currentState != null)
-        {
-            currentState.OnFixedUpdate();
-        }
-    }
 }

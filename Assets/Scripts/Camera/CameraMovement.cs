@@ -1,5 +1,4 @@
 using System;
-using TMPro;
 using UnityEngine;
 
 public class CameraMovement : MonoBehaviour
@@ -21,12 +20,12 @@ public class CameraMovement : MonoBehaviour
 
     private void Awake()
     {
-        EntityMovement.onEntityCreated += OnEntityCreated;
+        Controlable.onControlableChange += SetTarget;
     }
 
     private void OnDestroy()
     {
-        EntityMovement.onEntityCreated -= OnEntityCreated;
+        Controlable.onControlableChange -= SetTarget;
     }
 
     private void Start()
@@ -100,9 +99,10 @@ public class CameraMovement : MonoBehaviour
         return isAiming;
     }
 
-    public void OnEntityCreated(EntityMovement entity)
-    {
-        goTraget = entity.gameObject;
+    public void SetTarget(GameObject go)
+    { 
+        goTraget = go;
         onCameraCreate?.Invoke(this);
     }
+
 }

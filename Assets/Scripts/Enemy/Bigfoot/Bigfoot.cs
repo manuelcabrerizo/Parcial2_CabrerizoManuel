@@ -2,29 +2,32 @@ using UnityEngine;
 
 public class Bigfoot : Enemy
 {
+    [SerializeField] private Transform hand = null;
+    [SerializeField] private Transform target = null;
     [SerializeField] private float attackRadio = 4.0f;
-    [SerializeField] private Transform target;
-
-    private BigfootIdleState idleState;
-    private BigfootAttackState attackState;
+    private StateMachine stateMachine = null;
+    private BigfootIdleState idleState = null;
+    private BigfootAttackState attackState = null;
     private Animator animator;
 
-    public float AttackRadio => attackRadio;
+    public Transform Hand => hand;
     public Transform Target => target;
-
-
-    private StateMachine stateMachine = new StateMachine();
+    public float AttackRadio => attackRadio;
+    public StateMachine StateMachine => stateMachine;
+    public BigfootIdleState IdleState => idleState;
+    public BigfootAttackState AttackState => attackState;
+    public Animator Animator => animator;
 
     private void Awake()
     {
-        idleState = GetComponent<BigfootIdleState>();
-        attackState = GetComponent<BigfootAttackState>();
         animator = GetComponent<Animator>();
+        stateMachine = new StateMachine();
+        idleState = new BigfootIdleState(this);
+        attackState = new BigfootAttackState(this);
     }
 
     private void Start()
     {
-        attackState.SetBigfoot(this);
         stateMachine.PushState(idleState);
     }
 
@@ -35,32 +38,18 @@ public class Bigfoot : Enemy
 
     private void Update()
     {
-        float distance = (target.position - transform.position).magnitude;
-        if (stateMachine.PeekState() as MonoBehaviourState == idleState)
-        {
-            if (distance <= attackRadio)
-            {
-                animator.SetBool("IsAttaking", true);
-                stateMachine.ChangeState(attackState);
-            }
-        }
-        else if (stateMachine.PeekState() as MonoBehaviourState == attackState)
-        {
-            if (distance > attackRadio)
-            {
-                animator.SetBool("IsAttaking", false);
-                stateMachine.ChangeState(idleState);
-            }
-        }
         stateMachine.Update();
     }
 
-#if UNITY_EDITOR
-    private void OnDrawGizmos()
+    // Methods call from the animator
+    public void SpawnCrate()
     {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(transform.position, attackRadio);
+        attackState.SpawnCrate();
     }
-#endif
+
+    public void LunchCrate()
+    {
+        attackState.LunchCrate();
+    }
 
 }

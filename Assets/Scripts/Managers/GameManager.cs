@@ -3,14 +3,13 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
-    private EntityMovement entity = null;
     private SceneReferences main = null;
     private SceneReferences current = null;
     private string currentLoadedSceneName;
 
+    /*
     protected override void OnAwaken()
     {
-        EntityMovement.onEntityCreated += OnEntityCreated;
         SceneReferences.onLoaded += OnSceneReferencesLoaded;
         Portal.onPortalEnter += OnPortalEnter;
         Portal.onPortalToMainEnter += OnPortalToMainEnter;
@@ -18,13 +17,12 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     protected override void OnDestroyed()
     {
-        EntityMovement.onEntityCreated -= OnEntityCreated;
         SceneReferences.onLoaded -= OnSceneReferencesLoaded;
         Portal.onPortalEnter -= OnPortalEnter;
         Portal.onPortalToMainEnter -= OnPortalToMainEnter;
     }
-
-    private void OnEntityCreated(EntityMovement entity)
+    
+    private void OnEntityCreated(ControlableMovement entity)
     {
         this.entity = entity;
     }
@@ -74,5 +72,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         main.SetActiveGo(false);
         main.SetActiveControlables(false, entity.gameObject);
     }
+    */
 
 }
