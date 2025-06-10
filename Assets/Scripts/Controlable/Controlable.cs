@@ -9,10 +9,13 @@ public class ControlableData
     public float moveDirLenSq;
 
     public Rigidbody body;
-    public Animator animator;
     public CameraMovement cameraMovement;
     public Camera cam;
-    
+
+    // optional components
+    public Player player = null;
+    public Animator animator = null;
+
     public float speed = 40.0f;
     public Vector3 direction = Vector3.zero;
     public bool isGrounded = false;
@@ -22,7 +25,6 @@ public class ControlableData
 public class Controlable : MonoBehaviour
 {
     public static event Action<GameObject> onControlableChange;
-    public static Player player = null;
 
     private StateMachine stateMachine;
     private StateMachine additiveStateMachine;
@@ -37,14 +39,10 @@ public class Controlable : MonoBehaviour
 
     private void Awake()
     {
-        if (player == null)
-        {
-            player = gameObject.GetComponent<Player>();
-        }
-
         data = new ControlableData();
         data.body = GetComponent<Rigidbody>();
         data.animator = GetComponent<Animator>();
+        data.player = GetComponent<Player>();
         CameraMovement.onCameraCreate += OnCameraCreate;
 
         stateMachine = new StateMachine();
@@ -98,13 +96,15 @@ public class Controlable : MonoBehaviour
         playerStateGraph.AddStateTransitions(walkState, new List<State> { idleState, fallState, jumpState, spellCastState });
         playerStateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState, spellCastState });
         playerStateGraph.AddStateTransitions(jumpState, new List<State> { fallState, spellCastState });
-
         playerStateGraph.AddStateTransitions(spellCastState, new List<State> { idleState, walkState, jumpState, fallState });
         stateGraph.AddGraph(ControlableType.Player, playerStateGraph);
 
         StateGraph objectStateGraph = new StateGraph();
-        objectStateGraph.AddStateTransitions(idleState, new List<State> { walkState });
-        objectStateGraph.AddStateTransitions(walkState, new List<State> { idleState });
+        objectStateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, jumpState });
+        objectStateGraph.AddStateTransitions(walkState, new List<State> { idleState, fallState, jumpState });
+        objectStateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState });
+        objectStateGraph.AddStateTransitions(jumpState, new List<State> { fallState });
+
         stateGraph.AddGraph(ControlableType.Object, objectStateGraph);
 
         // set the initial state
@@ -128,6 +128,11 @@ public class Controlable : MonoBehaviour
     public void SetType(ControlableType type)
     {
         this.type = type;
+    }
+
+    public void SetPlayer(Player player)
+    {
+        data.player = player;
     }
 
     public void BreakFree()
@@ -190,7 +195,7 @@ public class Controlable : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                Controlable newControlable = player.gameObject.AddComponent<Controlable>();
+                Controlable newControlable = data.player.gameObject.AddComponent<Controlable>();
                 newControlable.SetType(ControlableType.Player);
                 BreakFree();
             }

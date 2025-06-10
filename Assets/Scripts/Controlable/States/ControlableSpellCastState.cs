@@ -8,9 +8,9 @@ public class ControlableSpellCastState : ControlableState
     private ParticleSystemRenderer particleRenderer = null;
     private ParticleSystemRenderer spellParticleRenderer = null;
 
-    int controlableLayer;
-    int enemyLayer;
-    int crateProjectileLayer;
+    private int controlableLayer;
+    private int enemyLayer;
+    private int crateProjectileLayer;
 
     public ControlableSpellCastState(Controlable controlable, Func<bool> condition) 
         : base(controlable, condition)
@@ -22,45 +22,43 @@ public class ControlableSpellCastState : ControlableState
 
     public override void OnEnter()
     {
-        if(particleRenderer == null)
+        ControlableData data = controlable.Data;
+
+        if (particleRenderer == null)
         {
-            particleRenderer = Controlable.player.AimParticleSystem.GetComponent<ParticleSystemRenderer>();
-            particleRenderer.material = Controlable.player.IdleMaterial;
+            particleRenderer = data.player.AimParticleSystem.GetComponent<ParticleSystemRenderer>();
+            particleRenderer.material = data.player.IdleMaterial;
         }
         if (spellParticleRenderer == null)
         {
-            spellParticleRenderer = Controlable.player.SpellParticleSystem.GetComponent<ParticleSystemRenderer>();
+            spellParticleRenderer = data.player.SpellParticleSystem.GetComponent<ParticleSystemRenderer>();
         }
 
-        ControlableData data = controlable.Data;
         mousePosX = Screen.width / 2;
         mousePosY = Screen.height / 2;
         if (data.animator != null)
         {
             data.animator.SetBool("IsAiming", true);
         }
-        Controlable.player.AimParticleSystem.Clear();
-        Controlable.player.AimParticleSystem.Play();
-
-        //Debug.Log("SpellCastState OnEnter");
+        data.player.AimParticleSystem.Play();
     }
 
     public override void OnExit()
     {
+        ProcessSpellCasting();
+
         ControlableData data = controlable.Data;
-        Controlable.player.AimParticleSystem.Stop();
+        data.player.AimParticleSystem.Clear();
+        data.player.AimParticleSystem.Stop();
         if (data.animator != null)
         {
             data.animator.SetBool("IsAiming", false);
         }
-        //Debug.Log("SpellCastState OnExit");
-
     }
 
     public override void OnUpdate()
     {
         ProcessAiming();
-        ProcessSpellCasting();
     }
 
     private void ProcessAiming()
@@ -82,10 +80,10 @@ public class ControlableSpellCastState : ControlableState
         float t;
         if (aimingPlane.Raycast(ray, out t))
         {
-            Controlable.player.AimParticleSystem.transform.position = ray.origin + ray.direction * t;
+            data.player.AimParticleSystem.transform.position = ray.origin + ray.direction * t;
         }
 
-        Vector3 screenPoint = data.cam.WorldToScreenPoint(Controlable.player.AimParticleSystem.transform.position);
+        Vector3 screenPoint = data.cam.WorldToScreenPoint(data.player.AimParticleSystem.transform.position);
         Ray aimRay = data.cam.ScreenPointToRay(screenPoint);
         RaycastHit hit;
         if (Physics.Raycast(aimRay, out hit))
@@ -96,21 +94,25 @@ public class ControlableSpellCastState : ControlableState
             {
                 if (layer.value == controlableLayer)
                 {
-                    particleRenderer.material = Controlable.player.ControlMaterial;
+                    particleRenderer.material = data.player.ControlMaterial;
                 }
                 else if (layer.value == enemyLayer)
                 {
-                    particleRenderer.material = Controlable.player.AttackMaterial;
+                    particleRenderer.material = data.player.AttackMaterial;
                 }
                 else if (layer.value == crateProjectileLayer)
                 {
-                    particleRenderer.material = Controlable.player.ControlMaterial;
+                    particleRenderer.material = data.player.ControlMaterial;
                 }
                 else
                 {
-                    particleRenderer.material = Controlable.player.IdleMaterial;
+                    particleRenderer.material = data.player.IdleMaterial;
                 }
             }
+        }
+        else
+        {
+            particleRenderer.material = data.player.IdleMaterial;
         }
     }
 
@@ -118,53 +120,50 @@ public class ControlableSpellCastState : ControlableState
     {
         ControlableData data = controlable.Data;
 
-        if (Input.GetMouseButtonUp(0))
+        Vector3 screenPoint = data.cam.WorldToScreenPoint(data.player.AimParticleSystem.transform.position);
+        Ray aimRay = data.cam.ScreenPointToRay(screenPoint);
+        RaycastHit hit;
+        if (Physics.Raycast(aimRay, out hit))
         {
-            Vector3 screenPoint = data.cam.WorldToScreenPoint(Controlable.player.AimParticleSystem.transform.position);
-            Ray aimRay = data.cam.ScreenPointToRay(screenPoint);
-            RaycastHit hit;
-            if (Physics.Raycast(aimRay, out hit))
+            GameObject go = hit.collider.gameObject;
+            LayerMask layer = go.layer;
+            if (go != data.body.gameObject)
             {
-                GameObject go = hit.collider.gameObject;
-                LayerMask layer = go.layer;
-                if (go != data.body.gameObject)
+                if (layer.value == controlableLayer)
                 {
-                    if (layer.value == controlableLayer)
-                    {
                         
-                        spellParticleRenderer.material = Controlable.player.ControlMaterial;
-                        Controlable.player.SpellParticleSystem.transform.position = go.transform.position;
-                        Controlable.player.SpellParticleSystem.transform.position += Vector3.up;
-                        Controlable.player.SpellParticleSystem.Play();
+                    spellParticleRenderer.material = data.player.ControlMaterial;
+                    data.player.SpellParticleSystem.transform.position = go.transform.position;
+                    data.player.SpellParticleSystem.transform.position += Vector3.up;
+                    data.player.SpellParticleSystem.Play();
 
-                        Controlable newControlable = go.AddComponent<Controlable>();
-                        newControlable.SetType(ControlableType.Object);
-                        controlable.BreakFree();
+                    Controlable newControlable = go.AddComponent<Controlable>();
+                    newControlable.SetType(ControlableType.Object);
+                    newControlable.SetPlayer(data.player);
+                    controlable.BreakFree();
                         
-                    }
-                    else if (layer.value == enemyLayer)
-                    {
-                        
-                        Enemy enemy = go.GetComponent<Enemy>();
-                        spellParticleRenderer.material = Controlable.player.AttackMaterial;
-                        Controlable.player.SpellParticleSystem.transform.position = enemy.transform.position;
-                        Controlable.player.SpellParticleSystem.transform.position += Vector3.up * 1.0f;
-                        Controlable.player.SpellParticleSystem.Play();
-                        enemy.Attack();
-                        
-                    }
-                    else if (layer.value == crateProjectileLayer)
-                    {
-                        CrateProjectile crate = go.GetComponent<CrateProjectile>();
-                        spellParticleRenderer.material = Controlable.player.IdleMaterial;
-                        Controlable.player.SpellParticleSystem.transform.position = crate.transform.position;
-                        Controlable.player.SpellParticleSystem.Play();
-                        crate.Lunch(crate.transform.position, crate.LaunchPosition, 1.0f);
-                    }
-
                 }
-            }
+                else if (layer.value == enemyLayer)
+                {
+                        
+                    Enemy enemy = go.GetComponent<Enemy>();
+                    spellParticleRenderer.material = data.player.AttackMaterial;
+                    data.player.SpellParticleSystem.transform.position = enemy.transform.position;
+                    data.player.SpellParticleSystem.transform.position += Vector3.up * 1.0f;
+                    data.player.SpellParticleSystem.Play();
+                    enemy.Attack();
+                        
+                }
+                else if (layer.value == crateProjectileLayer)
+                {
+                    CrateProjectile crate = go.GetComponent<CrateProjectile>();
+                    spellParticleRenderer.material = data.player.IdleMaterial;
+                    data.player.SpellParticleSystem.transform.position = crate.transform.position;
+                    data.player.SpellParticleSystem.Play();
+                    crate.Lunch(crate.transform.position, crate.LaunchPosition, 1.0f);
+                }
 
+            }
         }
     }
 
