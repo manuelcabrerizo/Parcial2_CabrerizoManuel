@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class ControlableSpellCastState : ControlableState
 {
@@ -11,8 +12,8 @@ public class ControlableSpellCastState : ControlableState
     int enemyLayer;
     int crateProjectileLayer;
 
-    public ControlableSpellCastState(Controlable controlable) 
-        : base(controlable)
+    public ControlableSpellCastState(Controlable controlable, Func<bool> condition) 
+        : base(controlable, condition)
     {
         controlableLayer = LayerMask.NameToLayer("Controlable");
         enemyLayer = LayerMask.NameToLayer("Enemy");
@@ -40,6 +41,8 @@ public class ControlableSpellCastState : ControlableState
         }
         Controlable.player.AimParticleSystem.Clear();
         Controlable.player.AimParticleSystem.Play();
+
+        //Debug.Log("SpellCastState OnEnter");
     }
 
     public override void OnExit()
@@ -50,6 +53,8 @@ public class ControlableSpellCastState : ControlableState
         {
             data.animator.SetBool("IsAiming", false);
         }
+        //Debug.Log("SpellCastState OnExit");
+
     }
 
     public override void OnUpdate()

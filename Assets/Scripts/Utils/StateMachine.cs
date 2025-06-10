@@ -73,4 +73,14 @@ public class StateMachine
         }
     }
 
+    public void FixedUpdate()
+    {
+        if (states.Count == 0) return;
+        IState currentState = states.Peek();
+        if (currentState != null)
+        {
+            currentState.OnFixedUpdate();
+        }
+    }
+
 }

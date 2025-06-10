@@ -13,4 +13,7 @@ public class State : IState
     public virtual void OnUpdate()
     {
     }
+    public virtual void OnFixedUpdate()
+    {
+    }
 }
