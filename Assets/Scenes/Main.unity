@@ -4157,6 +4157,10 @@ PrefabInstance:
       value: Player Aim
       objectReference: {fileID: 0}
     - target: {fileID: 5986141579133032699, guid: 4f745dba0e310b949a37d4c4ca406373, type: 3}
+      propertyPath: moveWithTransform
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5986141579133032699, guid: 4f745dba0e310b949a37d4c4ca406373, type: 3}
       propertyPath: moveWithCustomTransform
       value: 
       objectReference: {fileID: 963194228}
@@ -4486,9 +4490,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   heightRatio: 0.1
-  distance: 3.57
+  distance: 4.5
   xOffset: 0
-  yOffset: 1.4
+  yOffset: 1.5
   wallLayer:
     serializedVersion: 2
     m_Bits: 256

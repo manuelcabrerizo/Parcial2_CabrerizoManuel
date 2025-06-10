@@ -8,28 +8,9 @@ public class ControlableJumpState : ControlableState
 
     public override void OnEnter()
     {
-        Debug.Log("JumpState OnEnter");
         ControlableData data = controlable.Data;
+        data.body.velocity = new Vector3(data.body.velocity.x, 0.0f, data.body.velocity.z);
         data.body.AddForce(Vector3.up * 8.0f, ForceMode.Impulse);
-    }
-
-    public override void OnExit()
-    {
-        Debug.Log("JumpState OnExit");
-    }
-
-    public override void OnUpdate()
-    {
-        ControlableData data = controlable.Data;
-
-        Vector3 forward = data.body.transform.forward;
-        Vector3 right = data.body.transform.right;
-        data.body.transform.rotation = Quaternion.Euler(0.0f, data.cameraMovement.GetYaw(), 0.0f);
-        if (data.animator != null)
-        {
-            data.animator.SetFloat("VelocityZ", Vector3.Dot(data.body.velocity, forward));
-            data.animator.SetFloat("VelocityX", Vector3.Dot(data.body.velocity, right));
-        }
     }
 
     public override void OnFixedUpdate()

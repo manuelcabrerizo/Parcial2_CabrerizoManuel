@@ -18,6 +18,8 @@ public class ControlableSpellCastState : ControlableState
         controlableLayer = LayerMask.NameToLayer("Controlable");
         enemyLayer = LayerMask.NameToLayer("Enemy");
         crateProjectileLayer = LayerMask.NameToLayer("Crate Projectile");
+        mousePosX = Screen.width / 2;
+        mousePosY = Screen.height / 2;
     }
 
     public override void OnEnter()
@@ -34,8 +36,6 @@ public class ControlableSpellCastState : ControlableState
             spellParticleRenderer = data.player.SpellParticleSystem.GetComponent<ParticleSystemRenderer>();
         }
 
-        mousePosX = Screen.width / 2;
-        mousePosY = Screen.height / 2;
         if (data.animator != null)
         {
             data.animator.SetBool("IsAiming", true);
@@ -73,8 +73,20 @@ public class ControlableSpellCastState : ControlableState
         Vector3 planeNormal = -data.cameraMovement.transform.forward;
         Plane aimingPlane = new Plane(planeNormal, planePosition);
 
-        mousePosX = Mathf.Clamp(mousePosX + mouseX * mouseSpeed, 0.0f, Screen.width);
-        mousePosY = Mathf.Clamp(mousePosY + mouseY * mouseSpeed, 0.0f, Screen.height);
+        mousePosX += mouseX * mouseSpeed;
+        mousePosY += mouseY * mouseSpeed;
+        float radio = Screen.height * 0.4f;
+        Vector2 center = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        Vector2 mousePos = new Vector2(mousePosX, mousePosY);
+        if ((mousePos - center).sqrMagnitude > radio * radio)
+        {
+            mousePos = center + (mousePos - center).normalized * radio;
+        }
+        mousePosX = mousePos.x;
+        mousePosY = mousePos.y;
+
+        //mousePosX = Mathf.Clamp(mousePosX + mouseX * mouseSpeed, Screen.width * 0.3f, Screen.width * 0.7f);
+        //mousePosY = Mathf.Clamp(mousePosY + mouseY * mouseSpeed, Screen.height * 0.3f, Screen.height * 0.7f);
 
         Ray ray = data.cam.ScreenPointToRay(new Vector2(mousePosX, mousePosY));
         float t;
@@ -130,8 +142,7 @@ public class ControlableSpellCastState : ControlableState
             if (go != data.body.gameObject)
             {
                 if (layer.value == controlableLayer)
-                {
-                        
+                {       
                     spellParticleRenderer.material = data.player.ControlMaterial;
                     data.player.SpellParticleSystem.transform.position = go.transform.position;
                     data.player.SpellParticleSystem.transform.position += Vector3.up;
@@ -140,8 +151,7 @@ public class ControlableSpellCastState : ControlableState
                     Controlable newControlable = go.AddComponent<Controlable>();
                     newControlable.SetType(ControlableType.Object);
                     newControlable.SetPlayer(data.player);
-                    controlable.BreakFree();
-                        
+                    controlable.BreakFree(); 
                 }
                 else if (layer.value == enemyLayer)
                 {

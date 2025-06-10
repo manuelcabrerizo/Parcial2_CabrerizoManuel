@@ -4,22 +4,18 @@ using UnityEngine;
 
 public class ControlableData
 {
-    public float xInput;
-    public float yInput;
-    public float moveDirLenSq;
+    // Data
+    public float xInput = 0.0f;
+    public float yInput = 0.0f;
+    public float moveDirLenSq = 0.0f;
+    public bool isGrounded = false;
 
-    public Rigidbody body;
-    public CameraMovement cameraMovement;
-    public Camera cam;
-
-    // optional components
+    // Compoenents
+    public Rigidbody body = null;
+    public CameraMovement cameraMovement = null;
+    public Camera cam = null;
     public Player player = null;
     public Animator animator = null;
-
-    public float speed = 40.0f;
-    public Vector3 direction = Vector3.zero;
-    public bool isGrounded = false;
-    public float maxAngleMovement = 30f;
 }
 
 public class Controlable : MonoBehaviour
@@ -32,17 +28,16 @@ public class Controlable : MonoBehaviour
     private List<ControlableState> basicStates;
     private List<ControlableState> additiveStates;
 
-    private ControlableData data;
-    public ControlableData Data => data;
+    public ControlableData Data { get; private set; }
 
     [SerializeField] private ControlableType type;
 
     private void Awake()
     {
-        data = new ControlableData();
-        data.body = GetComponent<Rigidbody>();
-        data.animator = GetComponent<Animator>();
-        data.player = GetComponent<Player>();
+        Data = new ControlableData();
+        Data.body = GetComponent<Rigidbody>();
+        Data.animator = GetComponent<Animator>();
+        Data.player = GetComponent<Player>();
         CameraMovement.onCameraCreate += OnCameraCreate;
 
         stateMachine = new StateMachine();
@@ -50,7 +45,6 @@ public class Controlable : MonoBehaviour
         stateGraph = new ControlableStateGraph();
         basicStates = new List<ControlableState>();
         additiveStates = new List<ControlableState>();
-        
     }
 
     private void Start()
@@ -69,6 +63,7 @@ public class Controlable : MonoBehaviour
     {
         stateMachine.Update();
         additiveStateMachine.Update();
+        ProcessRotation();
         ProcessControlableData();
         ProcessBasicStates();
         ProcessAdditiveStates();
@@ -84,10 +79,10 @@ public class Controlable : MonoBehaviour
     private void SetupStates()
     {
         // Basic states
-        ControlableIdleState idleState = new ControlableIdleState(this, () => { return data.isGrounded && data.moveDirLenSq <= 0.01f; });
-        ControlableWalkState walkState = new ControlableWalkState(this, () => { return data.isGrounded && data.moveDirLenSq > 0.01f; });
-        ControlableJumpState jumpState = new ControlableJumpState(this, () => { return data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
-        ControlableFallState fallState = new ControlableFallState(this, () => { return !data.isGrounded && data.body.velocity.y <= 0.0f; });
+        ControlableIdleState idleState = new ControlableIdleState(this, () => { return Data.isGrounded && Data.moveDirLenSq <= 0.01f; });
+        ControlableWalkState walkState = new ControlableWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
+        ControlableJumpState jumpState = new ControlableJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
+        ControlableFallState fallState = new ControlableFallState(this, () => { return !Data.isGrounded && Data.body.velocity.y <= 0.0f; });
         // Additive states
         ControlableSpellCastState spellCastState = new ControlableSpellCastState(this, () => { return Input.GetMouseButton(0); });
 
@@ -119,36 +114,33 @@ public class Controlable : MonoBehaviour
         additiveStates.Add(spellCastState);
     }
 
-    private void OnCameraCreate(CameraMovement cam)
+    
+    private void ProcessRotation()
     {
-        data.cameraMovement = cam;
-        data.cam = data.cameraMovement.GetComponent<Camera>();
-    }
-
-    public void SetType(ControlableType type)
-    {
-        this.type = type;
-    }
-
-    public void SetPlayer(Player player)
-    {
-        data.player = player;
-    }
-
-    public void BreakFree()
-    {
-        Destroy(this);
+        Vector3 forward = Data.body.transform.forward;
+        Vector3 right = Data.body.transform.right;
+        Data.body.transform.rotation = Quaternion.Euler(0.0f, Data.cameraMovement.GetYaw(), 0.0f);
     }
 
     private void ProcessControlableData()
     {
-        Ray groundRay = new Ray(data.body.position, Vector3.up * -1.0f);
-        data.xInput = Input.GetAxis("Horizontal");
-        data.yInput = Input.GetAxis("Vertical");
-        data.moveDirLenSq = (data.xInput * data.xInput) + (data.yInput * data.yInput);
-        data.isGrounded = Physics.Raycast(groundRay, 0.75f);
-        data.body.useGravity = !data.isGrounded;
-        data.body.drag = data.isGrounded ? 5 : 0;
+        Ray groundRay = new Ray(Data.body.position, Vector3.up * -1.0f);
+        Data.xInput = Input.GetAxis("Horizontal");
+        Data.yInput = Input.GetAxis("Vertical");
+        Data.moveDirLenSq = (Data.xInput * Data.xInput) + (Data.yInput * Data.yInput);
+        Data.isGrounded = Physics.Raycast(groundRay, 0.75f);
+        Data.body.useGravity = !Data.isGrounded;
+        Data.body.drag = Data.isGrounded ? 5 : 0;
+
+        if (Data.animator != null)
+        {
+            Vector3 forward = Data.body.transform.forward;
+            Vector3 right = Data.body.transform.right;
+            Data.animator.SetFloat("VelocityZ", Vector3.Dot(Data.body.velocity, forward));
+            Data.animator.SetFloat("VelocityX", Vector3.Dot(Data.body.velocity, right));
+            Data.animator.SetBool("IsGrounded", Data.isGrounded);
+        }
+
     }
 
     private void ProcessBasicStates()
@@ -195,10 +187,31 @@ public class Controlable : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
-                Controlable newControlable = data.player.gameObject.AddComponent<Controlable>();
+                Controlable newControlable = Data.player.gameObject.AddComponent<Controlable>();
                 newControlable.SetType(ControlableType.Player);
                 BreakFree();
             }
         }
+    }
+
+    private void OnCameraCreate(CameraMovement cam)
+    {
+        Data.cameraMovement = cam;
+        Data.cam = Data.cameraMovement.GetComponent<Camera>();
+    }
+
+    public void SetType(ControlableType type)
+    {
+        this.type = type;
+    }
+
+    public void SetPlayer(Player player)
+    {
+        Data.player = player;
+    }
+
+    public void BreakFree()
+    {
+        Destroy(this);
     }
 }
