@@ -85,9 +85,6 @@ public class ControlableSpellCastState : ControlableState
         mousePosX = mousePos.x;
         mousePosY = mousePos.y;
 
-        //mousePosX = Mathf.Clamp(mousePosX + mouseX * mouseSpeed, Screen.width * 0.3f, Screen.width * 0.7f);
-        //mousePosY = Mathf.Clamp(mousePosY + mouseY * mouseSpeed, Screen.height * 0.3f, Screen.height * 0.7f);
-
         Ray ray = data.cam.ScreenPointToRay(new Vector2(mousePosX, mousePosY));
         float t;
         if (aimingPlane.Raycast(ray, out t))
@@ -158,21 +155,20 @@ public class ControlableSpellCastState : ControlableState
                     Controlable newControlable = go.AddComponent<Controlable>();
                     if (IsType<Player>(go))
                     {
-                        newControlable.SetType(ControlableType.Player);
+                        Player.InitControlable(newControlable);
                     }
                     else if (IsType<Bunny>(go))
                     {
-                        newControlable.SetType(ControlableType.Bunny);
+                        Bunny.InitControlable(newControlable);
                     }
                     else if (IsType<Dragon>(go))
                     {
-                        newControlable.SetType(ControlableType.Dragon);
+                        Dragon.InitControlable(newControlable);
                     }
                     else
                     {
-                        newControlable.SetType(ControlableType.Object);
+                        Object.InitControlable(newControlable);
                     }
-
                     newControlable.SetPlayer(data.player);
                     controlable.BreakFree(); 
                 }

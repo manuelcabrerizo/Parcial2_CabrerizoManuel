@@ -24,13 +24,11 @@ public class Controlable : MonoBehaviour
 
     private StateMachine stateMachine;
     private StateMachine additiveStateMachine;
-    private ControlableStateGraph stateGraph;
-    private List<ControlableState> basicStates;
-    private List<ControlableState> additiveStates;
+    private StateGraph stateGraph = null;
+    private List<ControlableState> basicStates = null;
+    private List<ControlableState> additiveStates = null;
 
     public ControlableData Data { get; private set; }
-
-    [SerializeField] private ControlableType type;
 
     private void Awake()
     {
@@ -42,14 +40,15 @@ public class Controlable : MonoBehaviour
 
         stateMachine = new StateMachine();
         additiveStateMachine = new StateMachine();
-        stateGraph = new ControlableStateGraph();
-        basicStates = new List<ControlableState>();
-        additiveStates = new List<ControlableState>();
     }
 
     private void Start()
     {
-        SetupStates();
+        Player testPlayer = null;
+        if (TryGetComponent<Player>(out testPlayer))
+        {
+            Player.InitControlable(this);
+        }
         onControlableChange?.Invoke(gameObject);
     }
 
@@ -77,64 +76,6 @@ public class Controlable : MonoBehaviour
         stateMachine.FixedUpdate();
         additiveStateMachine.FixedUpdate();
     }
-
-    private void SetupStates()
-    {
-        // Basic states
-        ControlableState idleState = new ControlableIdleState(this, () => { return Data.isGrounded && Data.moveDirLenSq <= 0.01f; });
-        ControlableState walkState = new ControlableWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
-        ControlableState fowardWalkState = new ControlableFowardWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
-        ControlableState jumpState = new ControlableJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
-        ControlableState highJumpState = new ControlableHighJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
-        ControlableState flyState = new ControlableFlyState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
-        ControlableState fallState = new ControlableFallState(this, () => { return !Data.isGrounded && Data.body.velocity.y <= 0.0f; });
-        // Additive states
-        ControlableState spellCastState = new ControlableSpellCastState(this, () => { return Input.GetMouseButton(0); });
-
-        StateGraph playerStateGraph = new StateGraph();
-        playerStateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, jumpState, spellCastState });
-        playerStateGraph.AddStateTransitions(walkState, new List<State> { idleState, fallState, jumpState, spellCastState });
-        playerStateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState, spellCastState });
-        playerStateGraph.AddStateTransitions(jumpState, new List<State> { fallState, spellCastState });
-        playerStateGraph.AddStateTransitions(spellCastState, new List<State> { idleState, walkState, jumpState, fallState });
-        stateGraph.AddGraph(ControlableType.Player, playerStateGraph);
-
-        StateGraph bunnyStateGraph = new StateGraph();
-        bunnyStateGraph.AddStateTransitions(idleState, new List<State> { fowardWalkState, fallState, highJumpState });
-        bunnyStateGraph.AddStateTransitions(fowardWalkState, new List<State> { idleState, fallState, highJumpState });
-        bunnyStateGraph.AddStateTransitions(fallState, new List<State> { idleState, fowardWalkState });
-        bunnyStateGraph.AddStateTransitions(highJumpState, new List<State> { fallState });
-        stateGraph.AddGraph(ControlableType.Bunny, bunnyStateGraph);
-
-        StateGraph dragonStateGraph = new StateGraph();
-        dragonStateGraph.AddStateTransitions(idleState, new List<State> { walkState, flyState, fallState });
-        dragonStateGraph.AddStateTransitions(walkState, new List<State> { idleState, flyState, fallState });
-        dragonStateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState });
-        dragonStateGraph.AddStateTransitions(flyState, new List<State> { idleState, walkState });
-        stateGraph.AddGraph(ControlableType.Dragon, dragonStateGraph);
-
-        StateGraph objectStateGraph = new StateGraph();
-        objectStateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, jumpState });
-        objectStateGraph.AddStateTransitions(walkState, new List<State> { idleState, fallState, jumpState });
-        objectStateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState });
-        objectStateGraph.AddStateTransitions(jumpState, new List<State> { fallState });
-        stateGraph.AddGraph(ControlableType.Object, objectStateGraph);
-
-        // set the initial state
-        stateMachine.PushState(idleState);
-
-        // Save basic states
-        basicStates.Add(idleState);
-        basicStates.Add(walkState);
-        basicStates.Add(fowardWalkState);
-        basicStates.Add(jumpState);
-        basicStates.Add(highJumpState);
-        basicStates.Add(flyState);
-        basicStates.Add(fallState);
-        // Save additive states
-        additiveStates.Add(spellCastState);
-    }
-
     
     private void ProcessRotation()
     {
@@ -163,7 +104,7 @@ public class Controlable : MonoBehaviour
         {
             if (state.Condition() && stateMachine.PeekState() != state)
             {
-                if (stateGraph.IsValid(type, stateMachine.PeekState() as State, state))
+                if (stateGraph.IsValid(stateMachine.PeekState() as State, state))
                 {
                     stateMachine.ChangeState(state);
                 }
@@ -179,7 +120,7 @@ public class Controlable : MonoBehaviour
             {
                 if (additiveStateMachine.PeekState() != state)
                 {
-                    if (stateGraph.IsValid(type, stateMachine.PeekState() as State, state))
+                    if (stateGraph.IsValid(stateMachine.PeekState() as State, state))
                     {
                         additiveStateMachine.PushState(state);
                     }
@@ -187,7 +128,7 @@ public class Controlable : MonoBehaviour
             }
             else if (additiveStateMachine.PeekState() != null && additiveStateMachine.PeekState() == state)
             {
-                if (stateGraph.IsValid(type, additiveStateMachine.PeekState() as State, stateMachine.PeekState() as State))
+                if (stateGraph.IsValid(additiveStateMachine.PeekState() as State, stateMachine.PeekState() as State))
                 {
                     additiveStateMachine.PopState();
                 }
@@ -197,14 +138,11 @@ public class Controlable : MonoBehaviour
 
     private void ProcessBreakFree()
     {
-        if (type != ControlableType.Player)
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                Controlable newControlable = Data.player.gameObject.AddComponent<Controlable>();
-                newControlable.SetType(ControlableType.Player);
-                BreakFree();
-            }
+            Controlable newControlable = Data.player.gameObject.AddComponent<Controlable>();
+            Player.InitControlable(newControlable);
+            BreakFree();
         }
     }
 
@@ -214,9 +152,12 @@ public class Controlable : MonoBehaviour
         Data.cam = Data.cameraMovement.GetComponent<Camera>();
     }
 
-    public void SetType(ControlableType type)
+    public void SetStates(List<ControlableState> basicStates, List<ControlableState> additiveStates, StateGraph stateGraph, State initialState)
     {
-        this.type = type;
+        this.basicStates = basicStates;
+        this.additiveStates = additiveStates;
+        this.stateGraph = stateGraph;
+        this.stateMachine.PushState(initialState);
     }
 
     public void SetPlayer(Player player)
