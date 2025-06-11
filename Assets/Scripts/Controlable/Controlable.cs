@@ -61,10 +61,12 @@ public class Controlable : MonoBehaviour
 
     private void Update()
     {
-        stateMachine.Update();
-        additiveStateMachine.Update();
         ProcessRotation();
         ProcessControlableData();
+
+        stateMachine.Update();
+        additiveStateMachine.Update();
+
         ProcessBasicStates();
         ProcessAdditiveStates();
         ProcessBreakFree();
@@ -79,12 +81,14 @@ public class Controlable : MonoBehaviour
     private void SetupStates()
     {
         // Basic states
-        ControlableIdleState idleState = new ControlableIdleState(this, () => { return Data.isGrounded && Data.moveDirLenSq <= 0.01f; });
-        ControlableWalkState walkState = new ControlableWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
-        ControlableJumpState jumpState = new ControlableJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
-        ControlableFallState fallState = new ControlableFallState(this, () => { return !Data.isGrounded && Data.body.velocity.y <= 0.0f; });
+        ControlableState idleState = new ControlableIdleState(this, () => { return Data.isGrounded && Data.moveDirLenSq <= 0.01f; });
+        ControlableState walkState = new ControlableWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
+        ControlableState jumpState = new ControlableJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
+        ControlableState highJumpState = new ControlableHighJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
+        ControlableState flyState = new ControlableFlyState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
+        ControlableState fallState = new ControlableFallState(this, () => { return !Data.isGrounded && Data.body.velocity.y <= 0.0f; });
         // Additive states
-        ControlableSpellCastState spellCastState = new ControlableSpellCastState(this, () => { return Input.GetMouseButton(0); });
+        ControlableState spellCastState = new ControlableSpellCastState(this, () => { return Input.GetMouseButton(0); });
 
         StateGraph playerStateGraph = new StateGraph();
         playerStateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, jumpState, spellCastState });
@@ -94,12 +98,25 @@ public class Controlable : MonoBehaviour
         playerStateGraph.AddStateTransitions(spellCastState, new List<State> { idleState, walkState, jumpState, fallState });
         stateGraph.AddGraph(ControlableType.Player, playerStateGraph);
 
+        StateGraph bunnyStateGraph = new StateGraph();
+        bunnyStateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, highJumpState });
+        bunnyStateGraph.AddStateTransitions(walkState, new List<State> { idleState, fallState, highJumpState });
+        bunnyStateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState });
+        bunnyStateGraph.AddStateTransitions(highJumpState, new List<State> { fallState });
+        stateGraph.AddGraph(ControlableType.Bunny, bunnyStateGraph);
+
+        StateGraph dragonStateGraph = new StateGraph();
+        dragonStateGraph.AddStateTransitions(idleState, new List<State> { walkState, flyState, fallState });
+        dragonStateGraph.AddStateTransitions(walkState, new List<State> { idleState, flyState, fallState });
+        dragonStateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState });
+        dragonStateGraph.AddStateTransitions(flyState, new List<State> { idleState, walkState });
+        stateGraph.AddGraph(ControlableType.Dragon, dragonStateGraph);
+
         StateGraph objectStateGraph = new StateGraph();
         objectStateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, jumpState });
         objectStateGraph.AddStateTransitions(walkState, new List<State> { idleState, fallState, jumpState });
         objectStateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState });
         objectStateGraph.AddStateTransitions(jumpState, new List<State> { fallState });
-
         stateGraph.AddGraph(ControlableType.Object, objectStateGraph);
 
         // set the initial state
@@ -109,6 +126,8 @@ public class Controlable : MonoBehaviour
         basicStates.Add(idleState);
         basicStates.Add(walkState);
         basicStates.Add(jumpState);
+        basicStates.Add(highJumpState);
+        basicStates.Add(flyState);
         basicStates.Add(fallState);
         // Save additive states
         additiveStates.Add(spellCastState);
@@ -130,7 +149,6 @@ public class Controlable : MonoBehaviour
         Data.moveDirLenSq = (Data.xInput * Data.xInput) + (Data.yInput * Data.yInput);
         Data.isGrounded = Physics.Raycast(groundRay, 0.75f);
         Data.body.useGravity = !Data.isGrounded;
-        Data.body.drag = Data.isGrounded ? 5 : 0;
 
         if (Data.animator != null)
         {

@@ -5,6 +5,7 @@ public class Bigfoot : Enemy
     [SerializeField] private Transform hand = null;
     [SerializeField] private Transform target = null;
     [SerializeField] private float attackRadio = 4.0f;
+
     private StateMachine stateMachine = null;
     private BigfootIdleState idleState = null;
     private BigfootAttackState attackState = null;

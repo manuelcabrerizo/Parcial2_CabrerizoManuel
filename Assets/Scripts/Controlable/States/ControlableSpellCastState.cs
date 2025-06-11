@@ -128,6 +128,13 @@ public class ControlableSpellCastState : ControlableState
         }
     }
 
+    private bool IsType<Type>(GameObject go) where Type : MonoBehaviour
+    {
+        Type component = null;
+        go.TryGetComponent<Type>(out component);
+        return component != null;
+    }
+
     private void ProcessSpellCasting()
     {
         ControlableData data = controlable.Data;
@@ -149,7 +156,23 @@ public class ControlableSpellCastState : ControlableState
                     data.player.SpellParticleSystem.Play();
 
                     Controlable newControlable = go.AddComponent<Controlable>();
-                    newControlable.SetType(ControlableType.Object);
+                    if (IsType<Player>(go))
+                    {
+                        newControlable.SetType(ControlableType.Player);
+                    }
+                    else if (IsType<Bunny>(go))
+                    {
+                        newControlable.SetType(ControlableType.Bunny);
+                    }
+                    else if (IsType<Dragon>(go))
+                    {
+                        newControlable.SetType(ControlableType.Dragon);
+                    }
+                    else
+                    {
+                        newControlable.SetType(ControlableType.Object);
+                    }
+
                     newControlable.SetPlayer(data.player);
                     controlable.BreakFree(); 
                 }

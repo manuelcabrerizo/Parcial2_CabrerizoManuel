@@ -6,6 +6,12 @@ public class ControlableWalkState : ControlableState
     public ControlableWalkState(Controlable controlable, Func<bool> condition) 
         : base(controlable, condition) { }
 
+    public override void OnEnter()
+    {
+        ControlableData data = controlable.Data;
+        data.body.drag = 5;
+    }
+
     public override void OnFixedUpdate()
     {
         ControlableData data = controlable.Data;
@@ -27,9 +33,9 @@ public class ControlableWalkState : ControlableState
 
         Vector3 horizontalVel = data.body.velocity;
         horizontalVel.y = 0;
-        if (horizontalVel.sqrMagnitude > (7.0f * 7.0f))
+        if (horizontalVel.sqrMagnitude > (14.0f * 14.0f))
         {
-            horizontalVel = horizontalVel.normalized * 7.0f;
+            horizontalVel = horizontalVel.normalized * 14.0f;
         }
         horizontalVel.y = data.body.velocity.y;
         data.body.velocity = horizontalVel;

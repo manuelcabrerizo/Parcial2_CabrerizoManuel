@@ -9,6 +9,7 @@ public class ControlableIdleState : ControlableState
     public override void OnEnter()
     {
         ControlableData data = controlable.Data;
+        data.body.drag = 5;
         if (data.animator != null)
         {
             data.animator.SetFloat("VelocityZ", 0);
