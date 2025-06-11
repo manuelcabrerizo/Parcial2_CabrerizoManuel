@@ -14,6 +14,16 @@ public class Player : MonoBehaviour
     public Material ControlMaterial => controlMaterial;
     public Material AttackMaterial => attackMaterial;
 
+    public ParticleSystemRenderer ParticleRenderer { get; private set; }
+    public ParticleSystemRenderer SpellParticleRenderer { get; private set; }
+
+    private void Awake()
+    {
+        ParticleRenderer = AimParticleSystem.GetComponent<ParticleSystemRenderer>();
+        SpellParticleRenderer = SpellParticleSystem.GetComponent<ParticleSystemRenderer>();
+        ParticleRenderer.material = IdleMaterial;
+    }
+
     static public void InitControlable(Controlable controlable)
     {
         ControlableData data = controlable.Data;

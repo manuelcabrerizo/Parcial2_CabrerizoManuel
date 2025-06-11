@@ -14,7 +14,7 @@ public class ControlableData
     public Rigidbody body = null;
     public CameraMovement cameraMovement = null;
     public Camera cam = null;
-    public Player player = null;
+    public GameObject prevControlable = null;
     public Animator animator = null;
 }
 
@@ -35,7 +35,6 @@ public class Controlable : MonoBehaviour
         Data = new ControlableData();
         Data.body = GetComponent<Rigidbody>();
         Data.animator = GetComponent<Animator>();
-        Data.player = GetComponent<Player>();
         CameraMovement.onCameraCreate += OnCameraCreate;
 
         stateMachine = new StateMachine();
@@ -136,13 +135,44 @@ public class Controlable : MonoBehaviour
         }
     }
 
+    private static bool IsType<Type>(GameObject go) where Type : MonoBehaviour
+    {
+        Type component = null;
+        go.TryGetComponent<Type>(out component);
+        return component != null;
+    }
+
+    public static void InitControlablePerType(GameObject go, Controlable newControlable)
+    {
+        if (IsType<Player>(go))
+        {
+            Player.InitControlable(newControlable);
+        }
+        else if (IsType<Bunny>(go))
+        {
+            Bunny.InitControlable(newControlable);
+        }
+        else if (IsType<Dragon>(go))
+        {
+            Dragon.InitControlable(newControlable);
+        }
+        else
+        {
+            Object.InitControlable(newControlable);
+        }
+    }
+
     private void ProcessBreakFree()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha1))
+        if (Data.prevControlable != null)
         {
-            Controlable newControlable = Data.player.gameObject.AddComponent<Controlable>();
-            Player.InitControlable(newControlable);
-            BreakFree();
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                Controlable newControlable = Data.prevControlable.AddComponent<Controlable>();
+                InitControlablePerType(Data.prevControlable, newControlable);
+                newControlable.SetPrevControlable(this.gameObject);
+                BreakFree();
+            }
         }
     }
 
@@ -160,9 +190,9 @@ public class Controlable : MonoBehaviour
         this.stateMachine.PushState(initialState);
     }
 
-    public void SetPlayer(Player player)
+    public void SetPrevControlable(GameObject prevControlable)
     {
-        Data.player = player;
+        Data.prevControlable = prevControlable;
     }
 
     public void BreakFree()
