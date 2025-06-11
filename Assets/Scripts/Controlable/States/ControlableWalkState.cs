@@ -12,6 +12,29 @@ public class ControlableWalkState : ControlableState
         data.body.drag = 5;
     }
 
+    public override void OnExit()
+    {
+        ControlableData data = controlable.Data;
+        data.body.drag = 5;
+        if (data.animator != null)
+        {
+            data.animator.SetFloat("VelocityZ", 0);
+            data.animator.SetFloat("VelocityX", 0);
+        }
+    }
+
+    public override void OnUpdate()
+    {
+        ControlableData data = controlable.Data;
+        if (data.animator != null)
+        {
+            Vector3 forward = data.body.transform.forward;
+            Vector3 right = data.body.transform.right;
+            data.animator.SetFloat("VelocityZ", Vector3.Dot(data.body.velocity, forward));
+            data.animator.SetFloat("VelocityX", Vector3.Dot(data.body.velocity, right));
+        }
+    }
+
     public override void OnFixedUpdate()
     {
         ControlableData data = controlable.Data;

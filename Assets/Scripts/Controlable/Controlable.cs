@@ -83,6 +83,7 @@ public class Controlable : MonoBehaviour
         // Basic states
         ControlableState idleState = new ControlableIdleState(this, () => { return Data.isGrounded && Data.moveDirLenSq <= 0.01f; });
         ControlableState walkState = new ControlableWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
+        ControlableState fowardWalkState = new ControlableFowardWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
         ControlableState jumpState = new ControlableJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
         ControlableState highJumpState = new ControlableHighJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
         ControlableState flyState = new ControlableFlyState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
@@ -99,9 +100,9 @@ public class Controlable : MonoBehaviour
         stateGraph.AddGraph(ControlableType.Player, playerStateGraph);
 
         StateGraph bunnyStateGraph = new StateGraph();
-        bunnyStateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, highJumpState });
-        bunnyStateGraph.AddStateTransitions(walkState, new List<State> { idleState, fallState, highJumpState });
-        bunnyStateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState });
+        bunnyStateGraph.AddStateTransitions(idleState, new List<State> { fowardWalkState, fallState, highJumpState });
+        bunnyStateGraph.AddStateTransitions(fowardWalkState, new List<State> { idleState, fallState, highJumpState });
+        bunnyStateGraph.AddStateTransitions(fallState, new List<State> { idleState, fowardWalkState });
         bunnyStateGraph.AddStateTransitions(highJumpState, new List<State> { fallState });
         stateGraph.AddGraph(ControlableType.Bunny, bunnyStateGraph);
 
@@ -125,6 +126,7 @@ public class Controlable : MonoBehaviour
         // Save basic states
         basicStates.Add(idleState);
         basicStates.Add(walkState);
+        basicStates.Add(fowardWalkState);
         basicStates.Add(jumpState);
         basicStates.Add(highJumpState);
         basicStates.Add(flyState);
@@ -148,17 +150,11 @@ public class Controlable : MonoBehaviour
         Data.yInput = Input.GetAxis("Vertical");
         Data.moveDirLenSq = (Data.xInput * Data.xInput) + (Data.yInput * Data.yInput);
         Data.isGrounded = Physics.Raycast(groundRay, 0.75f);
-        Data.body.useGravity = !Data.isGrounded;
-
         if (Data.animator != null)
         {
-            Vector3 forward = Data.body.transform.forward;
-            Vector3 right = Data.body.transform.right;
-            Data.animator.SetFloat("VelocityZ", Vector3.Dot(Data.body.velocity, forward));
-            Data.animator.SetFloat("VelocityX", Vector3.Dot(Data.body.velocity, right));
             Data.animator.SetBool("IsGrounded", Data.isGrounded);
         }
-
+        Data.body.useGravity = !Data.isGrounded;
     }
 
     private void ProcessBasicStates()
