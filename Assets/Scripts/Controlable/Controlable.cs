@@ -163,6 +163,7 @@ public class Controlable : MonoBehaviour
 
     public void BreakFree()
     {
+        Data.body.useGravity = true;
         Destroy(this);
     }
 
