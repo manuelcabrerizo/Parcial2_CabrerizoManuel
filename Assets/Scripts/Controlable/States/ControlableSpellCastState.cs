@@ -137,7 +137,6 @@ public class ControlableSpellCastState : ControlableState
                     player.SpellParticleSystem.transform.position += Vector3.up;
                     player.SpellParticleSystem.Play();
                     Controlable newControlable = go.AddComponent<Controlable>();
-                    newControlable.Initialize();
                     newControlable.SetPrevControlable(controlable.gameObject);
                     controlable.BreakFree(); 
                 }

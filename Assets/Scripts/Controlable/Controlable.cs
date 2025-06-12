@@ -68,7 +68,7 @@ public class Controlable : MonoBehaviour
         additiveStateMachine.FixedUpdate();
     }
 
-    public void Initialize()
+    private void Initialize()
     {
         CustomControlable customControlable = null;
         if (gameObject.TryGetComponent<CustomControlable>(out customControlable))
@@ -173,7 +173,6 @@ public class Controlable : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 Controlable newControlable = Data.prevControlable.AddComponent<Controlable>();
-                newControlable.Initialize();
                 newControlable.SetPrevControlable(this.gameObject);
                 BreakFree();
             }
