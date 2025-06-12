@@ -15,6 +15,7 @@ public class ControlableSpellCastState : ControlableState
     public ControlableSpellCastState(Controlable controlable, Func<bool> condition) 
         : base(controlable, condition)
     {
+        player = controlable.GetComponent<Player>();
         controlableLayer = LayerMask.NameToLayer("Controlable");
         enemyLayer = LayerMask.NameToLayer("Enemy");
         crateProjectileLayer = LayerMask.NameToLayer("Crate Projectile");
@@ -25,11 +26,6 @@ public class ControlableSpellCastState : ControlableState
     public override void OnEnter()
     {
         ControlableData data = controlable.Data;
-
-        if (player == null)
-        {
-            player = controlable.GetComponent<Player>();
-        }
         if (data.animator != null)
         {
             data.animator.SetBool("IsAiming", true);
@@ -141,7 +137,7 @@ public class ControlableSpellCastState : ControlableState
                     player.SpellParticleSystem.transform.position += Vector3.up;
                     player.SpellParticleSystem.Play();
                     Controlable newControlable = go.AddComponent<Controlable>();
-                    Controlable.InitControlablePerType(go, newControlable);
+                    newControlable.Initialize();
                     newControlable.SetPrevControlable(controlable.gameObject);
                     controlable.BreakFree(); 
                 }

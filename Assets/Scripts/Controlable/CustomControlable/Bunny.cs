@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Bunny : MonoBehaviour
+public class Bunny : CustomControlable
 {
-    static public void InitControlable(Controlable controlable)
+    public override void Initialize(Controlable controlable)
     {
         ControlableData data = controlable.Data;
-        
+
         ControlableState idleState = new ControlableIdleState(controlable, () => { return data.isGrounded && data.moveDirLenSq <= 0.01f; });
         ControlableState fowardWalkState = new ControlableFowardWalkState(controlable, () => { return data.isGrounded && data.moveDirLenSq > 0.01f; });
         ControlableState highJumpState = new ControlableHighJumpState(controlable, () => { return data.isGrounded && Input.GetKeyDown(KeyCode.Space); });

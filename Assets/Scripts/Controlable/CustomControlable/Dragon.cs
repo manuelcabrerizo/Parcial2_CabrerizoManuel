@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dragon : MonoBehaviour
+public class Dragon : CustomControlable
 {
-    static public void InitControlable(Controlable controlable)
+    public override void Initialize(Controlable controlable)
     {
         ControlableData data = controlable.Data;
 

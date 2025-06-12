@@ -4,13 +4,10 @@ using UnityEngine;
 
 public class ControlableData
 {
-    // Data
     public float xInput = 0.0f;
     public float yInput = 0.0f;
     public float moveDirLenSq = 0.0f;
     public bool isGrounded = false;
-
-    // Compoenents
     public Rigidbody body = null;
     public CameraMovement cameraMovement = null;
     public Camera cam = null;
@@ -21,14 +18,12 @@ public class ControlableData
 public class Controlable : MonoBehaviour
 {
     public static event Action<GameObject> onControlableChange;
-
+    public ControlableData Data { get; private set; }
     private StateMachine stateMachine;
     private StateMachine additiveStateMachine;
     private StateGraph stateGraph = null;
     private List<ControlableState> basicStates = null;
     private List<ControlableState> additiveStates = null;
-
-    public ControlableData Data { get; private set; }
 
     private void Awake()
     {
@@ -43,11 +38,7 @@ public class Controlable : MonoBehaviour
 
     private void Start()
     {
-        Player testPlayer = null;
-        if (TryGetComponent<Player>(out testPlayer))
-        {
-            Player.InitControlable(this);
-        }
+        Initialize();
         onControlableChange?.Invoke(gameObject);
     }
 
@@ -55,6 +46,7 @@ public class Controlable : MonoBehaviour
     {
         CameraMovement.onCameraCreate -= OnCameraCreate;
         stateMachine.Clear();
+        additiveStateMachine.Clear();
     }
 
     private void Update()
@@ -75,7 +67,41 @@ public class Controlable : MonoBehaviour
         stateMachine.FixedUpdate();
         additiveStateMachine.FixedUpdate();
     }
-    
+
+    public void Initialize()
+    {
+        CustomControlable customControlable = null;
+        if (gameObject.TryGetComponent<CustomControlable>(out customControlable))
+        {
+            customControlable.Initialize(this);
+        }
+        else
+        {
+            SetDeafultControlable();
+        }
+    }
+
+    private void SetDeafultControlable()
+    {
+        ControlableData data = Data;
+
+        ControlableState idleState = new ControlableIdleState(this, () => { return data.isGrounded && data.moveDirLenSq <= 0.01f; });
+        ControlableState walkState = new ControlableWalkState(this, () => { return data.isGrounded && data.moveDirLenSq > 0.01f; });
+        ControlableState jumpState = new ControlableJumpState(this, () => { return data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
+        ControlableState fallState = new ControlableFallState(this, () => { return !data.isGrounded && data.body.velocity.y <= 0.0f; });
+
+        StateGraph stateGraph = new StateGraph();
+        stateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, jumpState });
+        stateGraph.AddStateTransitions(walkState, new List<State> { idleState, fallState, jumpState });
+        stateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState });
+        stateGraph.AddStateTransitions(jumpState, new List<State> { fallState });
+
+        List<ControlableState> basicStates = new List<ControlableState> { idleState, walkState, fallState, jumpState };
+        List<ControlableState> additiveStates = new List<ControlableState> { };
+
+        SetStates(basicStates, additiveStates, stateGraph, idleState);
+    }
+
     private void ProcessRotation()
     {
         Vector3 forward = Data.body.transform.forward;
@@ -135,31 +161,9 @@ public class Controlable : MonoBehaviour
         }
     }
 
-    private static bool IsType<Type>(GameObject go) where Type : MonoBehaviour
+    public void BreakFree()
     {
-        Type component = null;
-        go.TryGetComponent<Type>(out component);
-        return component != null;
-    }
-
-    public static void InitControlablePerType(GameObject go, Controlable newControlable)
-    {
-        if (IsType<Player>(go))
-        {
-            Player.InitControlable(newControlable);
-        }
-        else if (IsType<Bunny>(go))
-        {
-            Bunny.InitControlable(newControlable);
-        }
-        else if (IsType<Dragon>(go))
-        {
-            Dragon.InitControlable(newControlable);
-        }
-        else
-        {
-            Object.InitControlable(newControlable);
-        }
+        Destroy(this);
     }
 
     private void ProcessBreakFree()
@@ -169,7 +173,7 @@ public class Controlable : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 Controlable newControlable = Data.prevControlable.AddComponent<Controlable>();
-                InitControlablePerType(Data.prevControlable, newControlable);
+                newControlable.Initialize();
                 newControlable.SetPrevControlable(this.gameObject);
                 BreakFree();
             }
@@ -193,10 +197,5 @@ public class Controlable : MonoBehaviour
     public void SetPrevControlable(GameObject prevControlable)
     {
         Data.prevControlable = prevControlable;
-    }
-
-    public void BreakFree()
-    {
-        Destroy(this);
     }
 }

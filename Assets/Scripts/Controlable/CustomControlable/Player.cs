@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : CustomControlable
 {
     [SerializeField] private ParticleSystem aimParticleSystem;
     [SerializeField] private ParticleSystem spellParticleSystem;
@@ -24,7 +24,7 @@ public class Player : MonoBehaviour
         ParticleRenderer.material = IdleMaterial;
     }
 
-    static public void InitControlable(Controlable controlable)
+    public override void Initialize(Controlable controlable)
     {
         ControlableData data = controlable.Data;
         // Basic states
@@ -47,5 +47,4 @@ public class Player : MonoBehaviour
 
         controlable.SetStates(basicStates, additiveStates, stateGraph, idleState);
     }
-
 }
