@@ -13,7 +13,6 @@ public class Player : CustomControlable
     public Material IdleMaterial => idleMaterial;
     public Material ControlMaterial => controlMaterial;
     public Material AttackMaterial => attackMaterial;
-
     public ParticleSystemRenderer ParticleRenderer { get; private set; }
     public ParticleSystemRenderer SpellParticleRenderer { get; private set; }
 

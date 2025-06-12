@@ -8,14 +8,8 @@ public class ControlableFallState : ControlableState
 
     public override void OnEnter()
     {
-        Debug.Log("Fall OnEnter");
         ControlableData data = controlable.Data;
         data.body.drag = 0;
-    }
-
-    public override void OnExit()
-    {
-        Debug.Log("Fall OnExit");
     }
 
     public override void OnFixedUpdate()

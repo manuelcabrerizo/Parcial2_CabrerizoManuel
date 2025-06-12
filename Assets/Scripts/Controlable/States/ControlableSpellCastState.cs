@@ -11,6 +11,7 @@ public class ControlableSpellCastState : ControlableState
     private int controlableLayer;
     private int enemyLayer;
     private int crateProjectileLayer;
+    private int movingPlatformLayer;
 
     public ControlableSpellCastState(Controlable controlable, Func<bool> condition) 
         : base(controlable, condition)
@@ -19,6 +20,7 @@ public class ControlableSpellCastState : ControlableState
         controlableLayer = LayerMask.NameToLayer("Controlable");
         enemyLayer = LayerMask.NameToLayer("Enemy");
         crateProjectileLayer = LayerMask.NameToLayer("Crate Projectile");
+        movingPlatformLayer = LayerMask.NameToLayer("MovingPlatform");
         mousePosX = Screen.width / 2;
         mousePosY = Screen.height / 2;
     }
@@ -103,6 +105,10 @@ public class ControlableSpellCastState : ControlableState
                 {
                     player.ParticleRenderer.material = player.ControlMaterial;
                 }
+                else if (layer.value == movingPlatformLayer)
+                {
+                    player.ParticleRenderer.material = player.ControlMaterial;
+                }
                 else
                 {
                     player.ParticleRenderer.material = player.IdleMaterial;
@@ -138,18 +144,18 @@ public class ControlableSpellCastState : ControlableState
                     player.SpellParticleSystem.Play();
                     Controlable newControlable = go.AddComponent<Controlable>();
                     newControlable.SetPrevControlable(controlable.gameObject);
-                    controlable.BreakFree(); 
+                    controlable.BreakFree();
                 }
                 else if (layer.value == enemyLayer)
                 {
-                        
+
                     Enemy enemy = go.GetComponent<Enemy>();
                     player.SpellParticleRenderer.material = player.AttackMaterial;
                     player.SpellParticleSystem.transform.position = enemy.transform.position;
                     player.SpellParticleSystem.transform.position += Vector3.up * 1.0f;
                     player.SpellParticleSystem.Play();
                     enemy.Attack();
-                        
+
                 }
                 else if (layer.value == crateProjectileLayer)
                 {
@@ -158,6 +164,14 @@ public class ControlableSpellCastState : ControlableState
                     player.SpellParticleSystem.transform.position = crate.transform.position;
                     player.SpellParticleSystem.Play();
                     crate.Lunch(crate.transform.position, crate.LaunchPosition, 1.0f);
+                }
+                else if (layer.value == movingPlatformLayer)
+                { 
+                    MovingPlatform platform = go.GetComponent<MovingPlatform>();
+                    player.SpellParticleRenderer.material = player.IdleMaterial;
+                    player.SpellParticleSystem.transform.position = platform.transform.position;
+                    player.SpellParticleSystem.Play();
+                    platform.MoveFrom(controlable.transform.position);
                 }
 
             }

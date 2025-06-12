@@ -19,18 +19,19 @@ public class Controlable : MonoBehaviour
 {
     public static event Action<GameObject> onControlableChange;
     public ControlableData Data { get; private set; }
-    private StateMachine stateMachine;
-    private StateMachine additiveStateMachine;
+    private StateMachine stateMachine = null;
+    private StateMachine additiveStateMachine = null;
     private StateGraph stateGraph = null;
     private List<ControlableState> basicStates = null;
     private List<ControlableState> additiveStates = null;
 
     private void Awake()
     {
+        CameraMovement.onCameraCreate += OnCameraCreate;
+
         Data = new ControlableData();
         Data.body = GetComponent<Rigidbody>();
         Data.animator = GetComponent<Animator>();
-        CameraMovement.onCameraCreate += OnCameraCreate;
 
         stateMachine = new StateMachine();
         additiveStateMachine = new StateMachine();
@@ -44,9 +45,10 @@ public class Controlable : MonoBehaviour
 
     private void OnDestroy()
     {
-        CameraMovement.onCameraCreate -= OnCameraCreate;
         stateMachine.Clear();
         additiveStateMachine.Clear();
+
+        CameraMovement.onCameraCreate -= OnCameraCreate;
     }
 
     private void Update()
@@ -83,12 +85,10 @@ public class Controlable : MonoBehaviour
 
     private void SetDeafultControlable()
     {
-        ControlableData data = Data;
-
-        ControlableState idleState = new ControlableIdleState(this, () => { return data.isGrounded && data.moveDirLenSq <= 0.01f; });
-        ControlableState walkState = new ControlableWalkState(this, () => { return data.isGrounded && data.moveDirLenSq > 0.01f; });
-        ControlableState jumpState = new ControlableJumpState(this, () => { return data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
-        ControlableState fallState = new ControlableFallState(this, () => { return !data.isGrounded && data.body.velocity.y <= 0.0f; });
+        ControlableState idleState = new ControlableIdleState(this, () => { return Data.isGrounded && Data.moveDirLenSq <= 0.01f; });
+        ControlableState walkState = new ControlableWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
+        ControlableState jumpState = new ControlableJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
+        ControlableState fallState = new ControlableFallState(this, () => { return !Data.isGrounded && Data.body.velocity.y <= 0.0f; });
 
         StateGraph stateGraph = new StateGraph();
         stateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, jumpState });
