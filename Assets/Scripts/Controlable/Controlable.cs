@@ -17,7 +17,7 @@ public class ControlableData
 
 public class Controlable : MonoBehaviour
 {
-    public static event Action<GameObject> onControlableChange;
+    public static event Action<Controlable> onControlableCreated;
     public ControlableData Data { get; private set; }
     private StateMachine stateMachine = null;
     private StateMachine additiveStateMachine = null;
@@ -40,7 +40,7 @@ public class Controlable : MonoBehaviour
     private void Start()
     {
         Initialize();
-        onControlableChange?.Invoke(gameObject);
+        onControlableCreated?.Invoke(this);
     }
 
     private void OnDestroy()

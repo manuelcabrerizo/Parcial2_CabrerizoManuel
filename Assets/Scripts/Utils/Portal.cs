@@ -3,22 +3,22 @@ using UnityEngine;
 
 public class Portal : MonoBehaviour
 {
-    public static event Action<GameObject, string, Transform> onPortalEnter;
-    public static event Action<GameObject> onPortalToMainEnter;
+    public static event Action<GameObject, string, Transform> onPortalToSceneEnter;
+    public static event Action<GameObject, Transform> onPortalToMainEnter;
 
     [SerializeField] private bool isPortalToMain;
     [SerializeField] private string sceneToLoadName;
-    [SerializeField] private Transform exitTransform;
+    [SerializeField] private Transform targetTransform;
 
     private void OnTriggerEnter(Collider other)
-    {
+    {        
         if (isPortalToMain)
         {
-            onPortalToMainEnter.Invoke(other.gameObject);
+            onPortalToMainEnter?.Invoke(other.gameObject, targetTransform);
         }
         else
         {
-            onPortalEnter?.Invoke(other.gameObject, sceneToLoadName, exitTransform);
+            onPortalToSceneEnter?.Invoke(other.gameObject, sceneToLoadName, targetTransform);
         }
     }
 }

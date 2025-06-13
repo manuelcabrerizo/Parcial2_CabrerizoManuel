@@ -6,9 +6,7 @@ public class SceneReferences : MonoBehaviour
 {
     public static event Action<SceneReferences> onLoaded;
 
-    [SerializeField] public Transform targetTransform;
     [SerializeField] private List<GameObject> gameObjects;
-    [SerializeField] private List<GameObject> controlables;
 
     private void Start()
     {
@@ -20,17 +18,6 @@ public class SceneReferences : MonoBehaviour
         foreach (GameObject go in gameObjects)
         {
             go.SetActive(value);   
-        }
-    }
-
-    public void SetActiveControlables(bool value, GameObject ignoreObject)
-    {
-        foreach (GameObject go in controlables)
-        {
-            if (go != ignoreObject)
-            {
-                go.SetActive(value);
-            }
         }
     }
 }

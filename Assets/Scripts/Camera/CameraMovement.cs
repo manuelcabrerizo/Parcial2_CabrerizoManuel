@@ -20,12 +20,12 @@ public class CameraMovement : MonoBehaviour
 
     private void Awake()
     {
-        Controlable.onControlableChange += SetTarget;
+        Controlable.onControlableCreated += SetTarget;
     }
 
     private void OnDestroy()
     {
-        Controlable.onControlableChange -= SetTarget;
+        Controlable.onControlableCreated -= SetTarget;
     }
 
     private void Start()
@@ -99,9 +99,9 @@ public class CameraMovement : MonoBehaviour
         return isAiming;
     }
 
-    public void SetTarget(GameObject go)
+    public void SetTarget(Controlable controlable)
     { 
-        goTraget = go;
+        goTraget = controlable.gameObject;
         onCameraCreate?.Invoke(this);
     }
 
