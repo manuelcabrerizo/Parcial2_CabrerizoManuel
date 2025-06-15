@@ -11,6 +11,7 @@ public class FadingWall : MonoBehaviour
     private MeshRenderer meshRenderer = null;
     private Camera cam = null;
     private CameraMovement cameraMovement = null;
+
     private bool isOpen = false;
 
     private void Awake()
@@ -50,15 +51,18 @@ public class FadingWall : MonoBehaviour
 
     private IEnumerator PlayOpenDoorAnimation()
     {
-        meshRenderer.enabled = false;
         cameraMovement.enabled = false;
         
         cam.transform.position = cameraTransform.position;
         cam.transform.rotation = cameraTransform.rotation;
 
+        meshRenderer.material.SetFloat("_Fading", 1.0f);
+
         float time = 0.0f;
         while (time <= 2.0f)
         {
+            float t = Mathf.Min((time / 1.25f), 1.0f);
+            meshRenderer.material.SetFloat("_Fading", 1.0f - t);
             yield return new WaitForEndOfFrame();
             time += Time.deltaTime;
         }
@@ -68,15 +72,18 @@ public class FadingWall : MonoBehaviour
 
     private IEnumerator PlayCloseDoorAnimation()
     {
-        meshRenderer.enabled = true;
         cameraMovement.enabled = false;
 
         cam.transform.position = cameraTransform.position;
         cam.transform.rotation = cameraTransform.rotation;
 
+        meshRenderer.material.SetFloat("_Fading", 0.0f);
+
         float time = 0.0f;
         while (time <= 2.0f)
         {
+            float t = Mathf.Min((time / 1.25f), 1.0f);
+            meshRenderer.material.SetFloat("_Fading", t);
             yield return new WaitForEndOfFrame();
             time += Time.deltaTime;
         }
