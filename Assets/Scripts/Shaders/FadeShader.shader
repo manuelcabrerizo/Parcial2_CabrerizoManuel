@@ -7,13 +7,14 @@ Shader "Unlit/FadeShader"
     }
     SubShader
     {
-        Tags { "QUEUE"="Transparent" "RenderType"="Transparent" }
+        Tags { "RenderType"="Transparent" "QUEUE"="Transparent" }
         LOD 100
 
         Pass
         {
-			Blend SrcAlpha OneMinusSrcAlpha
+			Blend SrcAlpha One
 			Cull Off
+			ZWrite Off
 
             CGPROGRAM
             #pragma vertex vert
@@ -37,11 +38,6 @@ Shader "Unlit/FadeShader"
             float4 _MainTex_ST;
 			float _Fading;
 
-			float Random(in float2 st)
-			{
-				return frac(sin(dot(st.xy, float2(12.9898, 78.233))) * 43758.5453123);
-			}
-
 			float2 ClosestPointToRect(float2 p, float2 min, float2 max)
 			{
 				float x = clamp(p.x, min.x, max.x);
@@ -59,24 +55,16 @@ Shader "Unlit/FadeShader"
 
             float4 frag (v2f i) : SV_Target
             {
-                float4 col = tex2D(_MainTex, i.uv);
+                float4 col = tex2D(_MainTex, i.uv) * 2.0f;
 
 				float2 pointA = i.uv;				
-				float2 pointB = ClosestPointToRect(pointA, float2(0.2f, 0.2f), float2(0.8f, 0.8f));
+				float2 pointB = ClosestPointToRect(pointA, float2(0.1f, 0.0f), float2(0.9f, 0.9f));
 
 				float diff = length(pointA - pointB);
-				diff = max(diff, 0.0f);
+				diff = max(diff, 0.0f) * 2.0f;
+				
+				col.w = _Fading + diff;
 
-				float2 uv = floor(i.uv * 256.0f);				
-				if(Random(uv) > 0.5f)
-				{
-					diff *= 0.0f;
-				}
-
-				if(Random(uv) >= _Fading)
-				{
-					col.w = _Fading + diff;
-				}
 				return col;
             }
 
