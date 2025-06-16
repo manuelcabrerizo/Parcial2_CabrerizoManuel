@@ -5,9 +5,6 @@ public class ControlableSpellCastState : ControlableState
 {
     private Player player = null;
 
-    private float mousePosX = 0.0f;
-    private float mousePosY = 0.0f;
-
     private int controlableLayer;
     private int enemyLayer;
     private int crateProjectileLayer;
@@ -21,18 +18,19 @@ public class ControlableSpellCastState : ControlableState
         enemyLayer = LayerMask.NameToLayer("Enemy");
         crateProjectileLayer = LayerMask.NameToLayer("Crate Projectile");
         movingPlatformLayer = LayerMask.NameToLayer("MovingPlatform");
-        mousePosX = Screen.width / 2;
-        mousePosY = Screen.height / 2;
+        controlable.Data.mousePosX = Screen.width / 2;
+        controlable.Data.mousePosY = Screen.height / 2;
     }
 
     public override void OnEnter()
     {
+        player.AimParticleSystem.transform.position = controlable.transform.position;
+        player.AimParticleSystem.Play();
         ControlableData data = controlable.Data;
         if (data.animator != null)
         {
             data.animator.SetBool("IsAiming", true);
         }
-        player.AimParticleSystem.Play();
     }
 
     public override void OnExit()
@@ -40,12 +38,12 @@ public class ControlableSpellCastState : ControlableState
         ProcessSpellCasting();
 
         ControlableData data = controlable.Data;
-        player.AimParticleSystem.Clear();
-        player.AimParticleSystem.Stop();
         if (data.animator != null)
         {
             data.animator.SetBool("IsAiming", false);
         }
+        player.AimParticleSystem.Stop();
+        player.AimParticleSystem.Clear();
     }
 
     public override void OnUpdate()
@@ -57,35 +55,8 @@ public class ControlableSpellCastState : ControlableState
     {
         ControlableData data = controlable.Data;
 
-        float mouseX = Input.GetAxis("Mouse X");
-        float mouseY = Input.GetAxis("Mouse Y");
-        float mouseSpeed = 8.0f;
-
-        Vector3 planePosition = data.cameraMovement.transform.position + data.cameraMovement.transform.forward * 4;
-        Vector3 planeNormal = -data.cameraMovement.transform.forward;
-        Plane aimingPlane = new Plane(planeNormal, planePosition);
-
-        mousePosX += mouseX * mouseSpeed;
-        mousePosY += mouseY * mouseSpeed;
-        float radio = Screen.height * 0.4f;
-        Vector2 center = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-        Vector2 mousePos = new Vector2(mousePosX, mousePosY);
-        if ((mousePos - center).sqrMagnitude > radio * radio)
-        {
-            mousePos = center + (mousePos - center).normalized * radio;
-        }
-        mousePosX = mousePos.x;
-        mousePosY = mousePos.y;
-
-        Ray ray = data.cam.ScreenPointToRay(new Vector2(mousePosX, mousePosY));
-        float t;
-        if (aimingPlane.Raycast(ray, out t))
-        {
-            player.AimParticleSystem.transform.position = ray.origin + ray.direction * t;
-        }
-
-        Vector3 screenPoint = data.cam.WorldToScreenPoint(player.AimParticleSystem.transform.position);
-        Ray aimRay = data.cam.ScreenPointToRay(screenPoint);
+        // Change Color
+        Ray aimRay = data.cam.ScreenPointToRay(new Vector2(data.mousePosX, data.mousePosY));
         RaycastHit hit;
         if (Physics.Raycast(aimRay, out hit))
         {
@@ -114,11 +85,20 @@ public class ControlableSpellCastState : ControlableState
                     player.ParticleRenderer.material = player.IdleMaterial;
                 }
             }
+            else
+            {
+                player.ParticleRenderer.material = player.IdleMaterial;
+            }
         }
-        else
-        {
-            player.ParticleRenderer.material = player.IdleMaterial;
-        }
+
+
+        // Set Visual position
+        Vector3 planePosition = player.transform.position + player.transform.forward;
+        Vector3 planeNormal = -player.transform.forward;
+        Plane aimingPlane = new Plane(planeNormal, planePosition);
+        float t = 0.0f;
+        aimingPlane.Raycast(aimRay, out t);
+        player.AimParticleSystem.transform.position = aimRay.origin + aimRay.direction * t;
     }
 
 
@@ -127,8 +107,8 @@ public class ControlableSpellCastState : ControlableState
     {
         ControlableData data = controlable.Data;
 
-        Vector3 screenPoint = data.cam.WorldToScreenPoint(player.AimParticleSystem.transform.position);
-        Ray aimRay = data.cam.ScreenPointToRay(screenPoint);
+        // Cast Spell
+        Ray aimRay = data.cam.ScreenPointToRay(new Vector2(data.mousePosX, data.mousePosY));
         RaycastHit hit;
         if (Physics.Raycast(aimRay, out hit))
         {

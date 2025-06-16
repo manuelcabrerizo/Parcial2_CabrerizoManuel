@@ -6,6 +6,7 @@ public class FadingWall : MonoBehaviour
 {
     [SerializeField] private List<PressurePlate> pressurePlates = null;
     [SerializeField] private Transform cameraTransform = null;
+    [SerializeField] private Light effectLight = null;
 
     private Collider collision = null;
     private MeshRenderer meshRenderer = null;
@@ -62,6 +63,7 @@ public class FadingWall : MonoBehaviour
         while (time <= 2.0f)
         {
             float t = Mathf.Min((time / 1.25f), 1.0f);
+            effectLight.intensity = Mathf.Lerp(5.0f, 2.0f, t);
             meshRenderer.material.SetFloat("_Fading", 1.0f - t);
             yield return new WaitForEndOfFrame();
             time += Time.deltaTime;
@@ -83,6 +85,7 @@ public class FadingWall : MonoBehaviour
         while (time <= 2.0f)
         {
             float t = Mathf.Min((time / 1.25f), 1.0f);
+            effectLight.intensity = Mathf.Lerp(2.0f, 5.0f, t);
             meshRenderer.material.SetFloat("_Fading", t);
             yield return new WaitForEndOfFrame();
             time += Time.deltaTime;

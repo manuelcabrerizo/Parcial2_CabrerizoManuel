@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class ControlableData
 {
+    public float mousePosX = 0.0f;
+    public float mousePosY = 0.0f;
+
     public float xInput = 0.0f;
     public float yInput = 0.0f;
     public float moveDirLenSq = 0.0f;
@@ -121,6 +124,21 @@ public class Controlable : MonoBehaviour
             Data.animator.SetBool("IsGrounded", Data.isGrounded);
         }
         Data.body.useGravity = !Data.isGrounded;
+
+        float mouseX = Input.GetAxis("Mouse X");
+        float mouseY = Input.GetAxis("Mouse Y");
+        float mouseSpeed = 8.0f;
+        Data.mousePosX += mouseX * mouseSpeed;
+        Data.mousePosY += mouseY * mouseSpeed;
+        float radio = Screen.height * 0.4f;
+        Vector2 center = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+        Vector2 mousePos = new Vector2(Data.mousePosX, Data.mousePosY);
+        if ((mousePos - center).sqrMagnitude > radio * radio)
+        {
+            mousePos = center + (mousePos - center).normalized * radio;
+        }
+        Data.mousePosX = mousePos.x;
+        Data.mousePosY = mousePos.y;
     }
 
     private void ProcessBasicStates()

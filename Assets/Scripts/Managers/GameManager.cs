@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     protected override void OnAwaken()
     {
+        Application.targetFrameRate = 60;
         SceneReferences.onLoaded += OnSceneReferencesLoaded;
         Portal.onPortalToSceneEnter += OnPortalToSceneEnter;
         Portal.onPortalToMainEnter += OnPortalToMainEnter;
