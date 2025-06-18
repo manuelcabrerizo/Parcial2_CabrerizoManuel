@@ -91,7 +91,6 @@ public class ControlableSpellCastState : ControlableState
             }
         }
 
-
         // Set Visual position
         Vector3 planePosition = player.transform.position + player.transform.forward;
         Vector3 planeNormal = -player.transform.forward;
@@ -128,19 +127,17 @@ public class ControlableSpellCastState : ControlableState
                 }
                 else if (layer.value == enemyLayer)
                 {
-
                     Enemy enemy = go.GetComponent<Enemy>();
                     player.SpellParticleRenderer.material = player.AttackMaterial;
                     player.SpellParticleSystem.transform.position = enemy.transform.position;
                     player.SpellParticleSystem.transform.position += Vector3.up * 1.0f;
                     player.SpellParticleSystem.Play();
                     enemy.Attack();
-
                 }
                 else if (layer.value == crateProjectileLayer)
                 {
                     CrateProjectile crate = go.GetComponent<CrateProjectile>();
-                    player.SpellParticleRenderer.material = player.IdleMaterial;
+                    player.SpellParticleRenderer.material = player.ControlMaterial;
                     player.SpellParticleSystem.transform.position = crate.transform.position;
                     player.SpellParticleSystem.Play();
                     crate.Lunch(crate.transform.position, crate.LaunchPosition, 1.0f);
@@ -148,7 +145,7 @@ public class ControlableSpellCastState : ControlableState
                 else if (layer.value == movingPlatformLayer)
                 { 
                     MovingPlatform platform = go.GetComponent<MovingPlatform>();
-                    player.SpellParticleRenderer.material = player.IdleMaterial;
+                    player.SpellParticleRenderer.material = player.ControlMaterial;
                     player.SpellParticleSystem.transform.position = platform.transform.position;
                     player.SpellParticleSystem.Play();
                     platform.MoveFrom(controlable.transform.position);

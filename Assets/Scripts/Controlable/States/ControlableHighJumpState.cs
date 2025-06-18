@@ -11,7 +11,7 @@ public class ControlableHighJumpState : ControlableState
         ControlableData data = controlable.Data;
         data.body.drag = 0;
         data.body.velocity = new Vector3(data.body.velocity.x, 0.0f, data.body.velocity.z);
-        data.body.AddForce(Vector3.up * 16.0f, ForceMode.Impulse);
+        data.body.AddForce(Vector3.up * 12.0f, ForceMode.Impulse);
     }
 
     public override void OnFixedUpdate()

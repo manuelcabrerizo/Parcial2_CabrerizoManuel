@@ -64,7 +64,6 @@ Shader "Unlit/FadeShader"
 
             float4 frag (v2f i) : SV_Target
             {
-
 				float2 noiseUv = i.uv;
 				noiseUv.y += _Time.x;
 				float4 noise = tex2D(_NoiseTex, noiseUv*0.25f);
