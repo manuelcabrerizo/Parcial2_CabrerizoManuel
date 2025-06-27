@@ -52,6 +52,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: pine_tree_n_3
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 97787b80803e66f498abdf6f54363688, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 2147483647
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 8164078558771037576, guid: 97787b80803e66f498abdf6f54363688, type: 3}

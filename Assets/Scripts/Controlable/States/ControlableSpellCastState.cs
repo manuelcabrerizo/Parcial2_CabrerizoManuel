@@ -24,9 +24,10 @@ public class ControlableSpellCastState : ControlableState
 
     public override void OnEnter()
     {
-        player.AimParticleSystem.transform.position = controlable.transform.position;
-        player.AimParticleSystem.Play();
         ControlableData data = controlable.Data;
+        Ray aimRay = data.cam.ScreenPointToRay(new Vector2(data.mousePosX, data.mousePosY));
+        player.AimParticleSystem.transform.position = GetAimPosition(data, aimRay);
+        player.AimParticleSystem.Play();
         if (data.animator != null)
         {
             data.animator.SetBool("IsAiming", true);
@@ -49,6 +50,16 @@ public class ControlableSpellCastState : ControlableState
     public override void OnUpdate()
     {
         ProcessAiming();
+    }
+
+    private Vector3 GetAimPosition(ControlableData data, Ray aimRay)
+    {
+        Vector3 planePosition = player.transform.position + player.transform.forward;
+        Vector3 planeNormal = -player.transform.forward;
+        Plane aimingPlane = new Plane(planeNormal, planePosition);
+        float t = 0.0f;
+        aimingPlane.Raycast(aimRay, out t);
+        return aimRay.origin + aimRay.direction * t;
     }
 
     private void ProcessAiming()
@@ -90,14 +101,7 @@ public class ControlableSpellCastState : ControlableState
                 player.ParticleRenderer.material = player.IdleMaterial;
             }
         }
-
-        // Set Visual position
-        Vector3 planePosition = player.transform.position + player.transform.forward;
-        Vector3 planeNormal = -player.transform.forward;
-        Plane aimingPlane = new Plane(planeNormal, planePosition);
-        float t = 0.0f;
-        aimingPlane.Raycast(aimRay, out t);
-        player.AimParticleSystem.transform.position = aimRay.origin + aimRay.direction * t;
+        player.AimParticleSystem.transform.position = GetAimPosition(data, aimRay);
     }
 
 
