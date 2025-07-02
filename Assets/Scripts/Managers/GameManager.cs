@@ -28,20 +28,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         Controlable.onControlableCreated -= OnControlableCreated;
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-#if UNITY_WEBGL
-        return;
-#endif
-            Application.Quit();
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#endif
-        }
-    }
-
     private void OnSceneReferencesLoaded(SceneReferences scene)
     {
         if (main == null)

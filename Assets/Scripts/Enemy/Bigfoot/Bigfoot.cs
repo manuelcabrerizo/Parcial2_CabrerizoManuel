@@ -13,13 +13,18 @@ public class Bigfoot : Enemy
     private StateGraph<Bigfoot> stateGraph;
     public Transform Hand => hand;
     public Animator Animator { get; private set; }
+    public Rigidbody Body { get; private set; }
 
     public float AttackRadio => attackRadio;
     public float Distance { get; private set; }
 
+    public PatrolPoints PatrolPoints { get; private set; }
+
     protected override void OnAwaken()
     {
         Animator = GetComponent<Animator>();
+        PatrolPoints = GetComponent<PatrolPoints>();
+        Body = GetComponent<Rigidbody>();
         stateGraph = new StateGraph<Bigfoot>();
     }
 
@@ -44,25 +49,43 @@ public class Bigfoot : Enemy
         stateGraph.Update();
     }
 
+    private void FixedUpdate()
+    {
+        stateGraph.FixedUpdate();
+    }
+
     private void InitializeStates()
     {
         State<Bigfoot> idleState = new BigfootIdleState(this,
-            () => { return Distance > AttackRadio; },
+            () => { return Distance > AttackRadio && PatrolPoints.GetCurrent() == null; },
+            () => { return Distance <= AttackRadio; });
+
+        State<Bigfoot> patrolState = new BigfootPatrolState(this,
+            () => { return Distance > AttackRadio && PatrolPoints.GetCurrent(); },
             () => { return Distance <= AttackRadio; });
 
         State<Bigfoot> attackState = new BigfootAttackState(this,
             () => { return Distance <= AttackRadio; },
             () => { return Distance > AttackRadio; });
 
-        stateGraph.AddStateTransitions(idleState, new List<State<Bigfoot>> { attackState });
-        stateGraph.AddStateTransitions(attackState, new List<State<Bigfoot>> { idleState });
+        stateGraph.AddStateTransitions(idleState, new List<State<Bigfoot>> { patrolState, attackState });
+        stateGraph.AddStateTransitions(attackState, new List<State<Bigfoot>> { idleState, patrolState });
+        stateGraph.AddStateTransitions(patrolState, new List<State<Bigfoot>> { idleState, attackState });
 
-        List<State<Bigfoot>> basicStates = new List<State<Bigfoot>> { idleState, attackState };
+
+        List<State<Bigfoot>> basicStates = new List<State<Bigfoot>> { idleState, attackState, patrolState };
         List<State<Bigfoot>> additiveStates = new List<State<Bigfoot>> { };
 
         stateGraph.AddBasicStates(basicStates);
         stateGraph.AddAdditiveStates(additiveStates);
-        stateGraph.SetInitialState(idleState);
+        if (PatrolPoints.GetCurrent())
+        {
+            stateGraph.SetInitialState(patrolState);
+        }
+        else
+        {
+            stateGraph.SetInitialState(idleState);
+        }
     }
 
     private void ProcessData()
