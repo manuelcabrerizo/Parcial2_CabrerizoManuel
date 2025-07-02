@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class ControlableFlyState : ControlableState
+public class ControlableFlyState : State<Controlable>
 {
     public ControlableFlyState(Controlable controlable, Func<bool> condition) 
         : base(controlable, condition) { }
@@ -9,7 +9,7 @@ public class ControlableFlyState : ControlableState
     public override void OnEnter()
     {
         Debug.Log("Fly OnEnter");
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         data.body.drag = 2.5f;
         data.body.velocity = new Vector3(data.body.velocity.x, 0.0f, data.body.velocity.z);
         data.isGrounded = false;
@@ -20,19 +20,19 @@ public class ControlableFlyState : ControlableState
     public override void OnExit()
     {
         Debug.Log("Fly OnExit");
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         data.body.useGravity = true;
     }
 
     public override void OnUpdate()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         data.body.useGravity = false;
     }
 
     public override void OnFixedUpdate()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
 
         Vector3 forward = data.cam.transform.forward;
         forward.y = 0;

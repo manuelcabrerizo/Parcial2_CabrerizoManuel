@@ -22,22 +22,16 @@ public class Controlable : MonoBehaviour
 {
     public static event Action<Controlable> onControlableCreated;
     public ControlableData Data { get; private set; }
-    private StateMachine stateMachine = null;
-    private StateMachine additiveStateMachine = null;
-    private StateGraph stateGraph = null;
-    private List<ControlableState> basicStates = null;
-    private List<ControlableState> additiveStates = null;
+    public StateGraph<Controlable> StateGraph { get; private set; }
 
     private void Awake()
     {
         CameraMovement.onCameraCreate += OnCameraCreate;
 
+        StateGraph = new StateGraph<Controlable>();
         Data = new ControlableData();
         Data.body = GetComponent<Rigidbody>();
         Data.animator = GetComponent<Animator>();
-
-        stateMachine = new StateMachine();
-        additiveStateMachine = new StateMachine();
     }
 
     private void Start()
@@ -48,9 +42,7 @@ public class Controlable : MonoBehaviour
 
     private void OnDestroy()
     {
-        stateMachine.Clear();
-        additiveStateMachine.Clear();
-
+        StateGraph.Clear();
         CameraMovement.onCameraCreate -= OnCameraCreate;
     }
 
@@ -58,19 +50,13 @@ public class Controlable : MonoBehaviour
     {
         ProcessRotation();
         ProcessControlableData();
-
-        stateMachine.Update();
-        additiveStateMachine.Update();
-
-        ProcessBasicStates();
-        ProcessAdditiveStates();
+        StateGraph.Update();
         ProcessBreakFree();
     }
 
     private void FixedUpdate()
     {
-        stateMachine.FixedUpdate();
-        additiveStateMachine.FixedUpdate();
+        StateGraph.FixedUpdate();
     }
 
     private void Initialize()
@@ -88,21 +74,22 @@ public class Controlable : MonoBehaviour
 
     private void SetDeafultControlable()
     {
-        ControlableState idleState = new ControlableIdleState(this, () => { return Data.isGrounded && Data.moveDirLenSq <= 0.01f; });
-        ControlableState walkState = new ControlableWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
-        ControlableState jumpState = new ControlableJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
-        ControlableState fallState = new ControlableFallState(this, () => { return !Data.isGrounded && Data.body.velocity.y <= 0.0f; });
+        State<Controlable> idleState = new ControlableIdleState(this, () => { return Data.isGrounded && Data.moveDirLenSq <= 0.01f; });
+        State<Controlable> walkState = new ControlableWalkState(this, () => { return Data.isGrounded && Data.moveDirLenSq > 0.01f; });
+        State<Controlable> jumpState = new ControlableJumpState(this, () => { return Data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
+        State<Controlable> fallState = new ControlableFallState(this, () => { return !Data.isGrounded && Data.body.velocity.y <= 0.0f; });
 
-        StateGraph stateGraph = new StateGraph();
-        stateGraph.AddStateTransitions(idleState, new List<State> { walkState, fallState, jumpState });
-        stateGraph.AddStateTransitions(walkState, new List<State> { idleState, fallState, jumpState });
-        stateGraph.AddStateTransitions(fallState, new List<State> { idleState, walkState });
-        stateGraph.AddStateTransitions(jumpState, new List<State> { fallState });
+        StateGraph.AddStateTransitions(idleState, new List<State<Controlable>> { walkState, fallState, jumpState });
+        StateGraph.AddStateTransitions(walkState, new List<State<Controlable>> { idleState, fallState, jumpState });
+        StateGraph.AddStateTransitions(fallState, new List<State<Controlable>> { idleState, walkState });
+        StateGraph.AddStateTransitions(jumpState, new List<State<Controlable>> { fallState });
 
-        List<ControlableState> basicStates = new List<ControlableState> { idleState, walkState, fallState, jumpState };
-        List<ControlableState> additiveStates = new List<ControlableState> { };
+        List<State<Controlable>> basicStates = new List<State<Controlable>> { idleState, walkState, fallState, jumpState };
+        List<State<Controlable>> additiveStates = new List<State<Controlable>> { };
 
-        SetStates(basicStates, additiveStates, stateGraph, idleState);
+        StateGraph.AddBasicStates(basicStates);
+        StateGraph.AddAdditiveStates(additiveStates);
+        StateGraph.SetInitialState(idleState);
     }
 
     private void ProcessRotation()
@@ -141,44 +128,6 @@ public class Controlable : MonoBehaviour
         Data.mousePosY = mousePos.y;
     }
 
-    private void ProcessBasicStates()
-    {
-        foreach (ControlableState state in basicStates)
-        {
-            if (state.Condition() && stateMachine.PeekState() != state)
-            {
-                if (stateGraph.IsValid(stateMachine.PeekState() as State, state))
-                {
-                    stateMachine.ChangeState(state);
-                }
-            }
-        }
-    }
-
-    private void ProcessAdditiveStates()
-    {
-        foreach (ControlableState state in additiveStates)
-        {
-            if (state.Condition())
-            {
-                if (additiveStateMachine.PeekState() != state)
-                {
-                    if (stateGraph.IsValid(stateMachine.PeekState() as State, state))
-                    {
-                        additiveStateMachine.PushState(state);
-                    }
-                }
-            }
-            else if (additiveStateMachine.PeekState() != null && additiveStateMachine.PeekState() == state)
-            {
-                if (stateGraph.IsValid(additiveStateMachine.PeekState() as State, stateMachine.PeekState() as State))
-                {
-                    additiveStateMachine.PopState();
-                }
-            }
-        }
-    }
-
     public void BreakFree()
     {
         Data.body.useGravity = true;
@@ -202,14 +151,6 @@ public class Controlable : MonoBehaviour
     {
         Data.cameraMovement = cam;
         Data.cam = Data.cameraMovement.GetComponent<Camera>();
-    }
-
-    public void SetStates(List<ControlableState> basicStates, List<ControlableState> additiveStates, StateGraph stateGraph, State initialState)
-    {
-        this.basicStates = basicStates;
-        this.additiveStates = additiveStates;
-        this.stateGraph = stateGraph;
-        this.stateMachine.PushState(initialState);
     }
 
     public void SetPrevControlable(GameObject prevControlable)

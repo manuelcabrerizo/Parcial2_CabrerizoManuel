@@ -1,56 +1,83 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Bigfoot : Enemy
 {
+    public static event Action<Bigfoot> onSpawnCrate;
+    public static event Action<Bigfoot> onLunchCrate;
+
     [SerializeField] private Transform hand = null;
-    [SerializeField] private Transform target = null;
     [SerializeField] private float attackRadio = 4.0f;
 
-    private StateMachine stateMachine = null;
-    private BigfootIdleState idleState = null;
-    private BigfootAttackState attackState = null;
-    private Animator animator;
-
+    private StateGraph<Bigfoot> stateGraph;
     public Transform Hand => hand;
-    public Transform Target => target;
+    public Animator Animator { get; private set; }
+
     public float AttackRadio => attackRadio;
-    public StateMachine StateMachine => stateMachine;
-    public BigfootIdleState IdleState => idleState;
-    public BigfootAttackState AttackState => attackState;
-    public Animator Animator => animator;
+    public float Distance { get; private set; }
 
-    private void Awake()
+    protected override void OnAwaken()
     {
-        animator = GetComponent<Animator>();
-        stateMachine = new StateMachine();
-        idleState = new BigfootIdleState(this);
-        attackState = new BigfootAttackState(this);
+        Animator = GetComponent<Animator>();
+        stateGraph = new StateGraph<Bigfoot>();
     }
 
-    private void Start()
+    protected override void OnStart()
     {
-        stateMachine.PushState(idleState);
+        InitializeStates();
     }
 
-    private void OnDestroy()
+    protected override void OnDestroyed()
     {
-        stateMachine.Clear();
+        stateGraph.Clear();
     }
 
     private void Update()
     {
-        stateMachine.Update();
+        if (Target == null)
+        {
+            return;
+        }
+
+        ProcessData();
+        stateGraph.Update();
+    }
+
+    private void InitializeStates()
+    {
+        State<Bigfoot> idleState = new BigfootIdleState(this,
+            () => { return Distance > AttackRadio; },
+            () => { return Distance <= AttackRadio; });
+
+        State<Bigfoot> attackState = new BigfootAttackState(this,
+            () => { return Distance <= AttackRadio; },
+            () => { return Distance > AttackRadio; });
+
+        stateGraph.AddStateTransitions(idleState, new List<State<Bigfoot>> { attackState });
+        stateGraph.AddStateTransitions(attackState, new List<State<Bigfoot>> { idleState });
+
+        List<State<Bigfoot>> basicStates = new List<State<Bigfoot>> { idleState, attackState };
+        List<State<Bigfoot>> additiveStates = new List<State<Bigfoot>> { };
+
+        stateGraph.AddBasicStates(basicStates);
+        stateGraph.AddAdditiveStates(additiveStates);
+        stateGraph.SetInitialState(idleState);
+    }
+
+    private void ProcessData()
+    {
+        Distance = (Target.position - transform.position).magnitude;
     }
 
     // Methods call from the animator
     public void SpawnCrate()
     {
-        attackState.SpawnCrate();
+        onSpawnCrate?.Invoke(this);
     }
 
     public void LunchCrate()
     {
-        attackState.LunchCrate();
+        onLunchCrate?.Invoke(this);
     }
-
 }

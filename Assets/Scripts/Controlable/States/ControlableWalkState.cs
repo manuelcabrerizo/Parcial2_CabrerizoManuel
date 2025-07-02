@@ -1,20 +1,20 @@
 ﻿using System;
 using UnityEngine;
 
-public class ControlableWalkState : ControlableState
+public class ControlableWalkState : State<Controlable>
 {
     public ControlableWalkState(Controlable controlable, Func<bool> condition) 
         : base(controlable, condition) { }
 
     public override void OnEnter()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         data.body.drag = 5;
     }
 
     public override void OnExit()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         data.body.drag = 5;
         if (data.animator != null)
         {
@@ -25,7 +25,7 @@ public class ControlableWalkState : ControlableState
 
     public override void OnUpdate()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         if (data.animator != null)
         {
             Vector3 forward = data.body.transform.forward;
@@ -37,7 +37,7 @@ public class ControlableWalkState : ControlableState
 
     public override void OnFixedUpdate()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
 
         Vector3 forward = data.cam.transform.forward;
         forward.y = 0;

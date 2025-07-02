@@ -1,67 +1,83 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
-public class BigfootAttackState : BigfootState
+public class BigfootAttackState : State<Bigfoot>
 {
     private CrateProjectile holdingCrate = null;
 
-    public BigfootAttackState(Bigfoot bigfoot)
-        : base(bigfoot) { }
+    public BigfootAttackState(Bigfoot owner, Func<bool> enterCondition, Func<bool> exitCondition)
+        : base(owner, enterCondition, exitCondition) { }
 
     public override void OnEnter()
     {
-        bigfoot.Animator.SetBool("IsAttaking", true);
+        Bigfoot.onSpawnCrate += OnSpawnCrate;
+        Bigfoot.onLunchCrate += OnLunchCrate;
+        owner.Animator.SetBool("IsAttaking", true);
+    }
+
+    public override void OnExit()
+    {
+        Bigfoot.onSpawnCrate -= OnSpawnCrate;
+        Bigfoot.onLunchCrate -= OnLunchCrate;
     }
 
     public override void OnUpdate()
     {
         FaceToTarget();
         SetHoldingCratePosition();
-
-        float distance = (bigfoot.Target.position - bigfoot.transform.position).magnitude;
-        if (distance > bigfoot.AttackRadio)
-        {
-            bigfoot.StateMachine.ChangeState(bigfoot.IdleState);
-        }
     }
 
     private void FaceToTarget()
     {
-        Vector3 forward = bigfoot.transform.forward;
+        Vector3 forward = owner.transform.forward;
         forward.y = 0.0f;
         forward.Normalize();
         Quaternion currentRotation = Quaternion.LookRotation(forward, Vector3.up);
 
-        forward = bigfoot.Target.position - bigfoot.transform.position;
+        forward = owner.Target.position - owner.transform.position;
         forward.y = 0.0f;
         forward.Normalize();
         Quaternion targetRotation = Quaternion.LookRotation(forward, Vector3.up);
 
         Quaternion newRotation = Quaternion.Slerp(currentRotation, targetRotation, Time.deltaTime * 2.0f);
-        bigfoot.transform.rotation = newRotation;
+        owner.transform.rotation = newRotation;
     }
 
     private void SetHoldingCratePosition()
     {
         if (holdingCrate != null)
         {
-            holdingCrate.transform.position = bigfoot.Hand.position;
-            holdingCrate.transform.rotation = bigfoot.Hand.rotation;
+            holdingCrate.transform.position = owner.Hand.position;
+            holdingCrate.transform.rotation = owner.Hand.rotation;
         }
     }
 
-    public void SpawnCrate()
+    private void OnSpawnCrate(Bigfoot bigfoot)
     {
+        if (bigfoot != owner)
+        {
+            return;
+        }
+
         holdingCrate = ProjectileSpawner.Instance.Spawn<CrateProjectile>();
-        holdingCrate.transform.position = bigfoot.Hand.position;
-        holdingCrate.transform.rotation = bigfoot.Hand.rotation;
+        holdingCrate.transform.position = owner.Hand.position;
+        holdingCrate.transform.rotation = owner.Hand.rotation;
     }
 
-    public void LunchCrate()
+    private void OnLunchCrate(Bigfoot bigfoot)
     {
-        float distance = (bigfoot.Target.position - bigfoot.transform.position).magnitude;
-        float attackRadioRatio = Mathf.Min(distance / bigfoot.AttackRadio, 1.0f);
-        float timeToTarget = 2.0f - (2.0f * (1.0f - attackRadioRatio));
-        holdingCrate.Lunch(holdingCrate.transform.position, bigfoot.Target.position, timeToTarget);
-        holdingCrate = null;
+        if (bigfoot != owner)
+        {
+            return;
+        }
+
+        if (holdingCrate != null)
+        {
+            float distance = (owner.Target.position - owner.transform.position).magnitude;
+            float attackRadioRatio = Mathf.Min(distance / owner.AttackRadio, 1.0f);
+            float timeToTarget = 2.0f - (2.0f * (1.0f - attackRadioRatio));
+            holdingCrate.Lunch(holdingCrate.transform.position, owner.Target.position, timeToTarget);
+            holdingCrate = null;
+        }
     }
 }

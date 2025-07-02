@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class ControlableSpellCastState : ControlableState
+public class ControlableSpellCastState : State<Controlable>
 {
     private Player player = null;
 
@@ -24,7 +24,7 @@ public class ControlableSpellCastState : ControlableState
 
     public override void OnEnter()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         Ray aimRay = data.cam.ScreenPointToRay(new Vector2(data.mousePosX, data.mousePosY));
         player.AimParticleSystem.transform.position = GetAimPosition(data, aimRay);
         player.AimParticleSystem.Play();
@@ -38,7 +38,7 @@ public class ControlableSpellCastState : ControlableState
     {
         ProcessSpellCasting();
 
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         if (data.animator != null)
         {
             data.animator.SetBool("IsAiming", false);
@@ -64,7 +64,7 @@ public class ControlableSpellCastState : ControlableState
 
     private void ProcessAiming()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
 
         // Change Color
         Ray aimRay = data.cam.ScreenPointToRay(new Vector2(data.mousePosX, data.mousePosY));
@@ -108,7 +108,7 @@ public class ControlableSpellCastState : ControlableState
 
     private void ProcessSpellCasting()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
 
         // Cast Spell
         Ray aimRay = data.cam.ScreenPointToRay(new Vector2(data.mousePosX, data.mousePosY));
@@ -126,8 +126,8 @@ public class ControlableSpellCastState : ControlableState
                     player.SpellParticleSystem.transform.position += Vector3.up;
                     player.SpellParticleSystem.Play();
                     Controlable newControlable = go.AddComponent<Controlable>();
-                    newControlable.SetPrevControlable(controlable.gameObject);
-                    controlable.BreakFree();
+                    newControlable.SetPrevControlable(owner.gameObject);
+                    owner.BreakFree();
                 }
                 else if (layer.value == enemyLayer)
                 {
@@ -152,7 +152,7 @@ public class ControlableSpellCastState : ControlableState
                     player.SpellParticleRenderer.material = player.ControlMaterial;
                     player.SpellParticleSystem.transform.position = platform.transform.position;
                     player.SpellParticleSystem.Play();
-                    platform.MoveFrom(controlable.transform.position);
+                    platform.MoveFrom(owner.transform.position);
                 }
 
             }

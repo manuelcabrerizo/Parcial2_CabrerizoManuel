@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class ControlableIdleState : ControlableState
+public class ControlableIdleState : State<Controlable>
 {
     public ControlableIdleState(Controlable controlable, Func<bool> condition)
         : base(controlable, condition) { }

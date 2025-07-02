@@ -1,14 +1,14 @@
 ﻿using System;
 using UnityEngine;
 
-public class ControlableHighJumpState : ControlableState
+public class ControlableHighJumpState : State<Controlable>
 {
     public ControlableHighJumpState(Controlable controlable, Func<bool> condition)
         : base(controlable, condition) { }
 
     public override void OnEnter()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         data.body.drag = 0;
         data.body.velocity = new Vector3(data.body.velocity.x, 0.0f, data.body.velocity.z);
         data.body.AddForce(Vector3.up * 12.0f, ForceMode.Impulse);
@@ -16,7 +16,7 @@ public class ControlableHighJumpState : ControlableState
 
     public override void OnFixedUpdate()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
 
         Vector3 forward = data.cam.transform.forward;
         forward.y = 0;

@@ -1,21 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
 
-public class BigfootIdleState : BigfootState
+public class BigfootIdleState : State<Bigfoot>
 {
-    public BigfootIdleState(Bigfoot bigfoot)
-    : base(bigfoot) { }
+    public BigfootIdleState(Bigfoot owner, Func<bool> enterCondition, Func<bool> exitCondition)
+        : base(owner, enterCondition, exitCondition) { }
 
     public override void OnEnter()
     {
-        bigfoot.Animator.SetBool("IsAttaking", false);
-    }
-
-    public override void OnUpdate()
-    {
-        float distance = (bigfoot.Target.position - bigfoot.transform.position).magnitude;
-        if (distance <= bigfoot.AttackRadio)
-        {
-            bigfoot.StateMachine.ChangeState(bigfoot.AttackState);
-        }   
+        owner.Animator.SetBool("IsAttaking", false);
     }
 }

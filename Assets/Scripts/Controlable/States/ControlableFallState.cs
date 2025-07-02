@@ -1,20 +1,20 @@
 ﻿using System;
 using UnityEngine;
 
-public class ControlableFallState : ControlableState
+public class ControlableFallState : State<Controlable>
 {
     public ControlableFallState(Controlable controlable, Func<bool> condition)
         : base(controlable, condition) { }
 
     public override void OnEnter()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
         data.body.drag = 0;
     }
 
     public override void OnFixedUpdate()
     {
-        ControlableData data = controlable.Data;
+        ControlableData data = owner.Data;
 
         Vector3 forward = data.cam.transform.forward;
         forward.y = 0;
