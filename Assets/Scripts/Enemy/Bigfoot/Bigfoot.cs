@@ -72,7 +72,6 @@ public class Bigfoot : Enemy
         stateGraph.AddStateTransitions(attackState, new List<State<Bigfoot>> { idleState, patrolState });
         stateGraph.AddStateTransitions(patrolState, new List<State<Bigfoot>> { idleState, attackState });
 
-
         List<State<Bigfoot>> basicStates = new List<State<Bigfoot>> { idleState, attackState, patrolState };
         List<State<Bigfoot>> additiveStates = new List<State<Bigfoot>> { };
 

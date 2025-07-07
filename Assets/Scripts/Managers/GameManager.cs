@@ -71,10 +71,4 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     {
         this.controlable = controlable;
     }
-
-    
-
-    
-
-
 }

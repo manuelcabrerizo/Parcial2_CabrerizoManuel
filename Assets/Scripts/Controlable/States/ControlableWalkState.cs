@@ -28,10 +28,10 @@ public class ControlableWalkState : State<Controlable>
         ControlableData data = owner.Data;
         if (data.animator != null)
         {
-            Vector3 forward = data.body.transform.forward;
-            Vector3 right = data.body.transform.right;
-            data.animator.SetFloat("VelocityZ", Vector3.Dot(data.body.velocity, forward));
-            data.animator.SetFloat("VelocityX", Vector3.Dot(data.body.velocity, right));
+            //Vector3 forward = data.body.transform.forward;
+            //Vector3 right = data.body.transform.right;
+            data.animator.SetFloat("VelocityZ", data.yInput*0.5f);
+            data.animator.SetFloat("VelocityX", data.xInput*0.5f);
         }
     }
 
