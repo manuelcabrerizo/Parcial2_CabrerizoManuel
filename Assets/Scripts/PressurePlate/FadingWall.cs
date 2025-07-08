@@ -53,7 +53,8 @@ public class FadingWall : MonoBehaviour
     private IEnumerator PlayOpenDoorAnimation()
     {
         cameraMovement.enabled = false;
-        
+        Time.timeScale = 0.0f;
+
         cam.transform.position = cameraTransform.position;
         cam.transform.rotation = cameraTransform.rotation;
 
@@ -66,20 +67,25 @@ public class FadingWall : MonoBehaviour
             effectLight.intensity = Mathf.Lerp(5.0f, 2.0f, t);
             meshRenderer.material.SetFloat("_Fading", 1.0f - t);
             yield return new WaitForEndOfFrame();
-            time += Time.deltaTime;
+            time += Time.unscaledDeltaTime;
         }
 
+        Time.timeScale = 1.0f;
         cameraMovement.enabled = true;
     }
 
     private IEnumerator PlayCloseDoorAnimation()
     {
+
         cameraMovement.enabled = false;
+        Time.timeScale = 0.0f;
+
 
         cam.transform.position = cameraTransform.position;
         cam.transform.rotation = cameraTransform.rotation;
 
         meshRenderer.material.SetFloat("_Fading", 0.0f);
+
 
         float time = 0.0f;
         while (time <= 2.0f)
@@ -88,9 +94,10 @@ public class FadingWall : MonoBehaviour
             effectLight.intensity = Mathf.Lerp(2.0f, 5.0f, t);
             meshRenderer.material.SetFloat("_Fading", t);
             yield return new WaitForEndOfFrame();
-            time += Time.deltaTime;
+            time += Time.unscaledDeltaTime;
         }
 
+        Time.timeScale = 1.0f;
         cameraMovement.enabled = true;
     }
 }

@@ -36,7 +36,7 @@ public class Player : CustomControlable
     {
         ControlableData data = controlable.Data;
         // Basic states
-        State<Controlable> idleState = new ControlableIdleState(controlable, () => { return data.isGrounded && data.moveDirLenSq <= 0.01f; });
+        State<Controlable> idleState = new PlayerIdleState(controlable, () => { return data.isGrounded && data.moveDirLenSq <= 0.01f; });
         State<Controlable> walkState = new ControlableWalkState(controlable, () => { return data.isGrounded && data.moveDirLenSq > 0.01f; });
         State<Controlable> jumpState = new ControlableJumpState(controlable, () => { return data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
         State<Controlable> fallState = new ControlableFallState(controlable, () => { return !data.isGrounded && data.body.velocity.y <= 0.0f; });

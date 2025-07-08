@@ -14,6 +14,7 @@ public class CameraMovement : MonoBehaviour
     private float yaw = 0;
     private float currentHeightRatio;
     private bool isAiming = false;
+    private bool isPaused = false;
 
     private GameObject goTraget;
 
@@ -21,11 +22,15 @@ public class CameraMovement : MonoBehaviour
     private void Awake()
     {
         Controlable.onControlableCreated += SetTarget;
+        PauseState.onPauseStateEnter += OnPauseStateEnter;
+        PauseState.onPauseStateExit += OnPauseStateExit;
     }
 
     private void OnDestroy()
     {
         Controlable.onControlableCreated -= SetTarget;
+        PauseState.onPauseStateEnter -= OnPauseStateEnter;
+        PauseState.onPauseStateExit -= OnPauseStateExit;
     }
 
     private void Start()
@@ -36,7 +41,10 @@ public class CameraMovement : MonoBehaviour
 
     private void Update()
     {
-        FollowPlayer();
+        if (!isPaused)
+        {
+            FollowPlayer();
+        }
     }
 
     private void FollowPlayer()
@@ -100,9 +108,19 @@ public class CameraMovement : MonoBehaviour
     }
 
     public void SetTarget(Controlable controlable)
-    { 
+    {
         goTraget = controlable.gameObject;
         onCameraCreate?.Invoke(this);
+    }
+
+    private void OnPauseStateEnter()
+    {
+        isPaused = true;
+    }
+
+    private void OnPauseStateExit()
+    {
+        isPaused = false;
     }
 
 }

@@ -9,6 +9,11 @@ public class ControlableData
 
     public float xInput = 0.0f;
     public float yInput = 0.0f;
+
+    public float smoothSpeed = 8.0f;
+    public float smoothXInput = 0.0f;
+    public float smoothYInput = 0.0f;
+
     public float moveDirLenSq = 0.0f;
     public bool isGrounded = false;
     public Rigidbody body = null;
@@ -104,6 +109,10 @@ public class Controlable : MonoBehaviour
         Ray groundRay = new Ray(Data.body.position, Vector3.up * -1.0f);
         Data.xInput = Input.GetAxis("Horizontal");
         Data.yInput = Input.GetAxis("Vertical");
+
+        Data.smoothXInput += (Data.xInput - Data.smoothXInput) * Data.smoothSpeed * Time.deltaTime;
+        Data.smoothYInput += (Data.yInput - Data.smoothYInput) * Data.smoothSpeed * Time.deltaTime;
+
         Data.moveDirLenSq = (Data.xInput * Data.xInput) + (Data.yInput * Data.yInput);
         Data.isGrounded = Physics.Raycast(groundRay, 0.75f);
         if (Data.animator != null)

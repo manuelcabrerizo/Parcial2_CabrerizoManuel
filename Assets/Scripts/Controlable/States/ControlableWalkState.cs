@@ -16,11 +16,6 @@ public class ControlableWalkState : State<Controlable>
     {
         ControlableData data = owner.Data;
         data.body.drag = 5;
-        if (data.animator != null)
-        {
-            data.animator.SetFloat("VelocityZ", 0);
-            data.animator.SetFloat("VelocityX", 0);
-        }
     }
 
     public override void OnUpdate()
@@ -28,10 +23,8 @@ public class ControlableWalkState : State<Controlable>
         ControlableData data = owner.Data;
         if (data.animator != null)
         {
-            //Vector3 forward = data.body.transform.forward;
-            //Vector3 right = data.body.transform.right;
-            data.animator.SetFloat("VelocityZ", data.yInput*0.5f);
-            data.animator.SetFloat("VelocityX", data.xInput*0.5f);
+            data.animator.SetFloat("VelocityX", data.smoothXInput*0.5f);
+            data.animator.SetFloat("VelocityZ", data.smoothYInput*0.5f);
         }
     }
 
