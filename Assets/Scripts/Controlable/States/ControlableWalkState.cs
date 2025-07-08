@@ -10,6 +10,7 @@ public class ControlableWalkState : State<Controlable>
     {
         ControlableData data = owner.Data;
         data.body.drag = 5;
+        data.currentJumpDone = 0;
     }
 
     public override void OnExit()
@@ -40,12 +41,14 @@ public class ControlableWalkState : State<Controlable>
         right.Normalize();
 
         Vector3 direction = forward * data.yInput + right * data.xInput;
-        if (direction.sqrMagnitude > 1.0f)
+        if (owner.CanMove(direction))
         {
-            direction.Normalize();
+            if (direction.sqrMagnitude > 1.0f)
+            {
+                direction.Normalize();
+            }
+            data.body.AddForce(direction * 30.0f, ForceMode.Force);
         }
-
-        data.body.AddForce(direction * 30.0f, ForceMode.Force);
 
         Vector3 horizontalVel = data.body.velocity;
         horizontalVel.y = 0;
@@ -55,37 +58,5 @@ public class ControlableWalkState : State<Controlable>
         }
         horizontalVel.y = data.body.velocity.y;
         data.body.velocity = horizontalVel;
-    }
-
-    /*
-    private bool CanMove(Vector3 moveDir)
-    {
-        ControlableData data = controlable.Data;
-
-        Terrain terrain = Terrain.activeTerrain;
-        Vector3 relativePos = GetMapPos();
-        Vector3 normal = terrain.terrainData.GetInterpolatedNormal(relativePos.x, relativePos.z);
-        float angle = Vector3.Angle(normal, Vector3.up);
-
-        float currentHeight = terrain.SampleHeight(data.body.position);
-        float nextHeight = terrain.SampleHeight(data.body.position + moveDir * 5);
-
-        if ((angle > data.maxAngleMovement) && (nextHeight > currentHeight))
-        {
-            return false;
-        }
-        return true;
-    }
-    private Vector3 GetMapPos()
-    {
-        ControlableData data = controlable.Data;
-
-        Vector3 pos = data.body.position;
-        Terrain terrain = Terrain.activeTerrain;
-
-        return new Vector3((pos.x - terrain.transform.position.x) / terrain.terrainData.size.x,
-                           0,
-                           (pos.z - terrain.transform.position.z) / terrain.terrainData.size.z);
-    }
-    */
+    }    
 }

@@ -38,7 +38,7 @@ public class Player : CustomControlable
         // Basic states
         State<Controlable> idleState = new PlayerIdleState(controlable, () => { return data.isGrounded && data.moveDirLenSq <= 0.01f; });
         State<Controlable> walkState = new ControlableWalkState(controlable, () => { return data.isGrounded && data.moveDirLenSq > 0.01f; });
-        State<Controlable> jumpState = new ControlableJumpState(controlable, () => { return data.isGrounded && Input.GetKeyDown(KeyCode.Space); });
+        State<Controlable> jumpState = new ControlableJumpState(controlable, () => { return (data.currentJumpDone < data.jumpCount) && Input.GetKeyDown(KeyCode.Space); });
         State<Controlable> fallState = new ControlableFallState(controlable, () => { return !data.isGrounded && data.body.velocity.y <= 0.0f; });
         // Additive states
         State<Controlable> spellCastState = new ControlableSpellCastState(controlable, () => { return Input.GetMouseButton(0); });
@@ -46,7 +46,7 @@ public class Player : CustomControlable
         StateGraph<Controlable> stateGraph = controlable.StateGraph;
         stateGraph.AddStateTransitions(idleState, new List<State<Controlable>> { walkState, fallState, jumpState, spellCastState });
         stateGraph.AddStateTransitions(walkState, new List<State<Controlable>> { idleState, fallState, jumpState, spellCastState });
-        stateGraph.AddStateTransitions(fallState, new List<State<Controlable>> { idleState, walkState, spellCastState });
+        stateGraph.AddStateTransitions(fallState, new List<State<Controlable>> { idleState, walkState, spellCastState, jumpState });
         stateGraph.AddStateTransitions(jumpState, new List<State<Controlable>> { fallState, spellCastState });
         stateGraph.AddStateTransitions(spellCastState, new List<State<Controlable>> { idleState, walkState, jumpState, fallState });
 

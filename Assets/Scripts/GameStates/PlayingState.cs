@@ -8,7 +8,7 @@ public class PlayingState : State<GameManager>
 
     public override void OnEnter()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     public override void OnExit()

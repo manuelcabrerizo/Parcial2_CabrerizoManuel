@@ -13,6 +13,7 @@ public class UIMainMenu : MonoBehaviour
 
     private void Awake()
     {
+        Cursor.lockState = CursorLockMode.None;
         playButton.onClick.AddListener(OnPlayButtonClick);
         controlsButton.onClick.AddListener(OnControlsButtonClick);
         creditsButton.onClick.AddListener(OnCreditsButtonClick);

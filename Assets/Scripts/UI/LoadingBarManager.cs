@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-public class UIManager : MonoBehaviour
+public class LoadingBarManager : MonoBehaviour
 {
     [SerializeField] private GameObject loadingBar;
     [SerializeField] private Image lodingBarImage;

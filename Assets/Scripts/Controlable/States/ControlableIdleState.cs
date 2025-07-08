@@ -12,6 +12,12 @@ public class PlayerIdleState : State<Controlable>
     public PlayerIdleState(Controlable controlable, Func<bool> condition)
         : base(controlable, condition) { }
 
+    public override void OnEnter()
+    {
+        ControlableData data = owner.Data;
+        data.currentJumpDone = 0;
+    }
+
     public override void OnUpdate()
     {
         ControlableData data = owner.Data;

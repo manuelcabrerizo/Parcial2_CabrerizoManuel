@@ -36,7 +36,6 @@ public class CameraMovement : MonoBehaviour
     private void Start()
     {
         currentHeightRatio = heightRatio;
-        Cursor.lockState = CursorLockMode.Locked;
     }
 
     private void Update()

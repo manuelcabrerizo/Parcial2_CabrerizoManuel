@@ -4,8 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
-    public static event Action<bool> onShowLoadingBar;
-    //public static event Action onLoadingBarChange;
+    public static Action<bool> onShowLoadingBar;
 
     private Controlable controlable = null;
     private SceneReferences main = null;
@@ -28,6 +27,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         Portal.onPortalToSceneEnter += OnPortalToSceneEnter;
         Portal.onPortalToMainEnter += OnPortalToMainEnter;
         Controlable.onControlableCreated += OnControlableCreated;
+        UIPause.onResumeButtonClick += PauseGame;
 
         fsm = new StateMachine();
         playingState = new PlayingState(this);
@@ -45,6 +45,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         Portal.onPortalToSceneEnter -= OnPortalToSceneEnter;
         Portal.onPortalToMainEnter -= OnPortalToMainEnter;
         Controlable.onControlableCreated -= OnControlableCreated;
+        UIPause.onResumeButtonClick -= PauseGame;
     }
 
     private void Update()

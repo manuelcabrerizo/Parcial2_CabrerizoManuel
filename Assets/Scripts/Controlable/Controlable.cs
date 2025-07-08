@@ -2,32 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ControlableData
-{
-    public float mousePosX = 0.0f;
-    public float mousePosY = 0.0f;
-
-    public float xInput = 0.0f;
-    public float yInput = 0.0f;
-
-    public float smoothSpeed = 8.0f;
-    public float smoothXInput = 0.0f;
-    public float smoothYInput = 0.0f;
-
-    public float moveDirLenSq = 0.0f;
-    public bool isGrounded = false;
-    public Rigidbody body = null;
-    public CameraMovement cameraMovement = null;
-    public Camera cam = null;
-    public GameObject prevControlable = null;
-    public Animator animator = null;
-}
-
 public class Controlable : MonoBehaviour
 {
     public static event Action<Controlable> onControlableCreated;
     public ControlableData Data { get; private set; }
     public StateGraph<Controlable> StateGraph { get; private set; }
+
+    [SerializeField] private float maxAngleMovement = 30.0f;
+
 
     private void Awake()
     {
@@ -165,5 +147,70 @@ public class Controlable : MonoBehaviour
     public void SetPrevControlable(GameObject prevControlable)
     {
         Data.prevControlable = prevControlable;
+    }
+
+    public bool CanMove(Vector3 moveDir)
+    { 
+        if (CheckTerrain(moveDir) == false)
+        {
+            return false;
+        }
+        if (CheckObjects(moveDir) == false)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private bool CheckObjects(Vector3 moveDir)
+    {
+        Ray downRay = new Ray(Data.body.position, Vector3.up * -1.0f);
+        RaycastHit hit;
+        Physics.Raycast(downRay, out hit);
+
+        Ray nextDownRay = new Ray(Data.body.position - Vector3.up * 0.5f, moveDir.normalized);
+        RaycastHit nextHit;
+        Physics.Raycast(nextDownRay, out nextHit);
+
+        Vector3 normal = hit.normal;
+        float angle = Vector3.Angle(normal, Vector3.up);
+
+        float currentHeight = hit.point.y;
+        float nextHeight = nextHit.point.y;
+
+        if ((angle > maxAngleMovement) && (nextHeight > currentHeight))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private bool CheckTerrain(Vector3 moveDir)
+    {
+        if (Terrain.activeTerrain == null)
+        {
+            return true;
+        }
+
+        Terrain terrain = Terrain.activeTerrain;
+        Vector3 relativePos = GetMapPos();
+        Vector3 normal = terrain.terrainData.GetInterpolatedNormal(relativePos.x, relativePos.z);
+        float angle = Vector3.Angle(normal, Vector3.up);
+        float currentHeight = terrain.SampleHeight(Data.body.position);
+        float nextHeight = terrain.SampleHeight(Data.body.position + moveDir * 5);
+        if ((angle > maxAngleMovement) && (nextHeight > currentHeight))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private Vector3 GetMapPos()
+    {
+        Vector3 pos = Data.body.position;
+        Terrain terrain = Terrain.activeTerrain;
+        return new Vector3((pos.x - terrain.transform.position.x) / terrain.terrainData.size.x,
+                           0,
+                           (pos.z - terrain.transform.position.z) / terrain.terrainData.size.z);
     }
 }
