@@ -14,6 +14,7 @@ public class Player : CustomControlable, IDamagable
     [SerializeField] private int life = 10;
     [SerializeField] private float mana = 1;
     [SerializeField] private LayerMask damagableMask;
+    [SerializeField] private LayerMask bookLayer;
     [SerializeField] private ParticleSystem aimParticleSystem;
     [SerializeField] private ParticleSystem spellParticleSystem;
     [SerializeField] private Material idleMaterial;
@@ -77,6 +78,11 @@ public class Player : CustomControlable, IDamagable
             {
                 TakeDamage(1);
             }
+        }
+
+        if (Utils.CheckCollisionLayer(collision.gameObject, bookLayer))
+        {
+            onPlayerWin?.Invoke(this);
         }
     }
 

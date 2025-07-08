@@ -6287,11 +6287,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac07f2a1c55a5c94491ab3cbdf75eb7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  life: 10
+  life: 5
   mana: 1
   damagableMask:
     serializedVersion: 2
     m_Bits: 64
+  bookLayer:
+    serializedVersion: 2
+    m_Bits: 4096
   aimParticleSystem: {fileID: 4491292749771327029}
   spellParticleSystem: {fileID: 330697454482030761}
   idleMaterial: {fileID: 2100000, guid: fb2b30f0bbec4574ab947e423e2f73ce, type: 2}
@@ -6311,9 +6314,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxAngleMovement: 30
-  ignoreGroundRay:
-    serializedVersion: 2
-    m_Bits: 2048
 --- !u!135 &7844329967162003552
 SphereCollider:
   m_ObjectHideFlags: 0
