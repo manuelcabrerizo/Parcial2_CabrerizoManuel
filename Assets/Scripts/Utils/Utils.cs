@@ -4,7 +4,8 @@ public class Utils
 {
     static public bool CheckCollisionLayer(GameObject gameObject, LayerMask layer)
     {
-        return ((1 << gameObject.layer) & layer.value) > 0;
+        bool result = ((1 << gameObject.layer) & layer.value) > 0;
+        return result;
     }
 
     public static float AdjustAngle(float angle)

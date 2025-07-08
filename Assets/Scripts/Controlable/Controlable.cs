@@ -9,6 +9,7 @@ public class Controlable : MonoBehaviour
     public StateGraph<Controlable> StateGraph { get; private set; }
 
     [SerializeField] private float maxAngleMovement = 30.0f;
+    private LayerMask ignoreGroundRay;
 
 
     private void Awake()
@@ -19,6 +20,9 @@ public class Controlable : MonoBehaviour
         Data = new ControlableData();
         Data.body = GetComponent<Rigidbody>();
         Data.animator = GetComponent<Animator>();
+
+        ignoreGroundRay = LayerMask.NameToLayer("IgnoreGroundRay");
+
     }
 
     private void Start()
@@ -96,7 +100,17 @@ public class Controlable : MonoBehaviour
         Data.smoothYInput += (Data.yInput - Data.smoothYInput) * Data.smoothSpeed * Time.deltaTime;
 
         Data.moveDirLenSq = (Data.xInput * Data.xInput) + (Data.yInput * Data.yInput);
-        Data.isGrounded = Physics.Raycast(groundRay, 0.75f);
+
+        Data.isGrounded = false;
+        RaycastHit hit;
+        if (Physics.Raycast(groundRay, out hit, 0.75f))
+        {
+            if (hit.collider.gameObject.layer != ignoreGroundRay.value)
+            {
+                Data.isGrounded = true;
+            }
+        }
+
         if (Data.animator != null)
         {
             Data.animator.SetBool("IsGrounded", Data.isGrounded);

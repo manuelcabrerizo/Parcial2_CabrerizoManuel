@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PressurePlate : MonoBehaviour
+public class PressurePlate : Signable
 {
     [SerializeField] private Transform buttonTransform;
     private Vector3 restPosition;
@@ -32,7 +32,7 @@ public class PressurePlate : MonoBehaviour
         isPressed = false;
     }
 
-    public bool IsPressed()
+    public override bool IsSignal()
     {
         return isPressed;
     }

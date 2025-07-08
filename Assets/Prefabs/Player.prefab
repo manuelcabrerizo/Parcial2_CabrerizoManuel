@@ -6288,6 +6288,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   life: 10
+  mana: 1
   damagableMask:
     serializedVersion: 2
     m_Bits: 64
@@ -6310,6 +6311,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxAngleMovement: 30
+  ignoreGroundRay:
+    serializedVersion: 2
+    m_Bits: 2048
 --- !u!135 &7844329967162003552
 SphereCollider:
   m_ObjectHideFlags: 0

@@ -16,7 +16,7 @@ TagManager:
   - CameraCollision
   - Controlable
   - MovingPlatform
-  - 
+  - IgnoreGroundRay
   - 
   - 
   - 

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7134541099512536591}
   - component: {fileID: 7968944231777222946}
   - component: {fileID: 5572735126440477777}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Door Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7539967468621434566}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: TargetPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -127,7 +127,7 @@ GameObject:
   - component: {fileID: 6638306675495426364}
   - component: {fileID: 3065146059321675380}
   - component: {fileID: 2390280925203995058}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Portal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -165,7 +165,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isPortalToMain: 0
   sceneToLoadName: 
-  exitTransform: {fileID: 0}
+  targetTransform: {fileID: 0}
 --- !u!65 &2390280925203995058
 BoxCollider:
   m_ObjectHideFlags: 0

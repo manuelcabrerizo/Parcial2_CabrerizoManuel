@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class FadingWall : MonoBehaviour
 {
-    [SerializeField] private List<PressurePlate> pressurePlates = null;
+    [SerializeField] private List<Signable> signables = null;
     [SerializeField] private Transform cameraTransform = null;
     [SerializeField] private Light effectLight = null;
 
@@ -26,15 +26,15 @@ public class FadingWall : MonoBehaviour
     private void Update()
     {
         int count = 0;
-        foreach (PressurePlate pressurePlate in pressurePlates)
+        foreach (Signable signable in signables)
         {
-            if (pressurePlate.IsPressed())
+            if (signable.IsSignal())
             {
                 count++;
             }
         }
 
-        if (!isOpen && count == pressurePlates.Count)
+        if (!isOpen && count == signables.Count)
         {
             isOpen = true;
             collision.enabled = false;
@@ -42,7 +42,7 @@ public class FadingWall : MonoBehaviour
         }
 
 
-        if (isOpen && count != pressurePlates.Count)
+        if (isOpen && count != signables.Count)
         {
             isOpen = false;
             collision.enabled = true;
