@@ -8,6 +8,7 @@ public class Player : CustomControlable, IDamagable
     public static event Action<int, int> onLifeChange;
     public static event Action<float, float> onManaChange;
 
+    public static event Action<Player> onPlayerWin;
     public static event Action<Player> onPlayerKill;
 
     [SerializeField] private int life = 10;

@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         Portal.onPortalToMainEnter += OnPortalToMainEnter;
         Controlable.onControlableCreated += OnControlableCreated;
         UIPause.onResumeButtonClick += PauseGame;
+        Player.onPlayerWin += OnPlayerWin;
+        Player.onPlayerKill += OnPlayerKill;
 
         fsm = new StateMachine();
         playingState = new PlayingState(this);
@@ -46,6 +48,8 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         Portal.onPortalToMainEnter -= OnPortalToMainEnter;
         Controlable.onControlableCreated -= OnControlableCreated;
         UIPause.onResumeButtonClick -= PauseGame;
+        Player.onPlayerWin -= OnPlayerWin;
+        Player.onPlayerKill -= OnPlayerKill;
     }
 
     private void Update()
@@ -141,5 +145,15 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     private void OnControlableCreated(Controlable controlable)
     {
         this.controlable = controlable;
+    }
+
+    private void OnPlayerWin(Player player)
+    {
+        fsm.ChangeState(winState);
+    }
+
+    private void OnPlayerKill(Player player)
+    {
+        fsm.ChangeState(gameOverState);
     }
 }
