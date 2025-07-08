@@ -28,6 +28,11 @@ public class ControlableFlyState : State<Controlable>
     {
         ControlableData data = owner.Data;
         data.body.useGravity = false;
+        
+        if (data.animator != null)
+        {
+            data.animator.SetFloat("Velocity", Mathf.Clamp01(data.yInput));
+        }
     }
 
     public override void OnFixedUpdate()
@@ -51,7 +56,7 @@ public class ControlableFlyState : State<Controlable>
             upInput = -1.0f;
         }
 
-        Vector3 direction = forward * data.yInput + right * data.xInput + Vector3.up * upInput;
+        Vector3 direction = forward * data.yInput + Vector3.up * upInput;
         if (direction.sqrMagnitude > 1.0f)
         {
             direction.Normalize();

@@ -15,10 +15,6 @@ public class ControlableFowardWalkState : State<Controlable>
     public override void OnExit()
     {
         ControlableData data = owner.Data;
-        if (data.animator != null)
-        {
-            data.animator.SetFloat("Velocity", 0);
-        }
     }
 
     public override void OnUpdate()
@@ -28,7 +24,7 @@ public class ControlableFowardWalkState : State<Controlable>
         {
             Vector3 forward = data.body.transform.forward;
             Vector3 right = data.body.transform.right;
-            data.animator.SetFloat("Velocity", Vector3.Dot(data.body.velocity, forward));
+            data.animator.SetFloat("Velocity", Mathf.Clamp01(data.yInput));
         }
     }
 
