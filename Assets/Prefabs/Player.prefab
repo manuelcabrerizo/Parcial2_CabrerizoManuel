@@ -6287,11 +6287,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac07f2a1c55a5c94491ab3cbdf75eb7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  life: 10
+  damagableMask:
+    serializedVersion: 2
+    m_Bits: 64
   aimParticleSystem: {fileID: 4491292749771327029}
   spellParticleSystem: {fileID: 330697454482030761}
   idleMaterial: {fileID: 2100000, guid: fb2b30f0bbec4574ab947e423e2f73ce, type: 2}
   controlMaterial: {fileID: 2100000, guid: d8c22b5d7fe3c744b9bbbcb0a3b1ce12, type: 2}
   attackMaterial: {fileID: 2100000, guid: dfc44ea2757cc8d40b37594e2fc1d58f, type: 2}
+  skinnedMeshRenderer: {fileID: 7763047208151644554}
 --- !u!114 &5092473374609590356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6304,6 +6309,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e0af22cf08da74c9260d310a00cf06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxAngleMovement: 30
 --- !u!135 &7844329967162003552
 SphereCollider:
   m_ObjectHideFlags: 0

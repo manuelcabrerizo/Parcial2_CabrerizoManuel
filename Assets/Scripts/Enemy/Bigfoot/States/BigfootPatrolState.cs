@@ -10,6 +10,7 @@ public class BigfootPatrolState : State<Bigfoot>
 
     public override void OnEnter()
     {
+        Debug.Log("Patrol OnEnter");
         owner.Animator.SetBool("IsAttaking", false);
         owner.Animator.SetBool("IsWalking", true);
         target = owner.PatrolPoints.GetClosest(owner.transform.position);
@@ -17,6 +18,7 @@ public class BigfootPatrolState : State<Bigfoot>
 
     public override void OnExit()
     {
+        Debug.Log("Patrol OnExit");
         owner.Animator.SetBool("IsWalking", false);
     }
 

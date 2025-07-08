@@ -10,6 +10,8 @@ public class BigfootAttackState : State<Bigfoot>
 
     public override void OnEnter()
     {
+        Debug.Log("Attack OnEnter");
+
         Bigfoot.onSpawnCrate += OnSpawnCrate;
         Bigfoot.onLunchCrate += OnLunchCrate;
         owner.Animator.SetBool("IsAttaking", true);
@@ -17,6 +19,8 @@ public class BigfootAttackState : State<Bigfoot>
 
     public override void OnExit()
     {
+        Debug.Log("Attack OnExit");
+
         Bigfoot.onSpawnCrate -= OnSpawnCrate;
         Bigfoot.onLunchCrate -= OnLunchCrate;
     }
@@ -62,6 +66,8 @@ public class BigfootAttackState : State<Bigfoot>
         holdingCrate = ProjectileSpawner.Instance.Spawn<CrateProjectile>();
         holdingCrate.transform.position = owner.Hand.position;
         holdingCrate.transform.rotation = owner.Hand.rotation;
+        holdingCrate.Collision.enabled = false;
+        holdingCrate.Body.isKinematic = true;
     }
 
     private void OnLunchCrate(Bigfoot bigfoot)
@@ -76,7 +82,11 @@ public class BigfootAttackState : State<Bigfoot>
             float distance = (owner.Target.position - owner.transform.position).magnitude;
             float attackRadioRatio = Mathf.Min(distance / owner.AttackRadio, 1.0f);
             float timeToTarget = 2.0f - (2.0f * (1.0f - attackRadioRatio));
-            holdingCrate.Lunch(holdingCrate.transform.position, owner.Target.position, timeToTarget);
+
+            holdingCrate.Collision.enabled = true;
+            holdingCrate.Body.isKinematic = false;
+            
+            holdingCrate.Lunch(holdingCrate.transform.position, owner.Target.position, owner.Aim, timeToTarget);
             holdingCrate = null;
         }
     }

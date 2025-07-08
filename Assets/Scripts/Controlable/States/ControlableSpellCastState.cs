@@ -108,8 +108,12 @@ public class ControlableSpellCastState : State<Controlable>
 
     private void ProcessSpellCasting()
     {
-        ControlableData data = owner.Data;
+        if (player.Mana < 1.0f)
+        {
+            return;
+        }
 
+        ControlableData data = owner.Data;
         // Cast Spell
         Ray aimRay = data.cam.ScreenPointToRay(new Vector2(data.mousePosX, data.mousePosY));
         RaycastHit hit;
@@ -128,6 +132,7 @@ public class ControlableSpellCastState : State<Controlable>
                     Controlable newControlable = go.AddComponent<Controlable>();
                     newControlable.SetPrevControlable(owner.gameObject);
                     owner.BreakFree();
+                    player.CastSpell();
                 }
                 else if (layer.value == enemyLayer)
                 {
@@ -136,7 +141,8 @@ public class ControlableSpellCastState : State<Controlable>
                     player.SpellParticleSystem.transform.position = enemy.transform.position;
                     player.SpellParticleSystem.transform.position += Vector3.up * 1.0f;
                     player.SpellParticleSystem.Play();
-                    enemy.Attack();
+                    enemy.TakeDamage(1);
+                    player.CastSpell();
                 }
                 else if (layer.value == crateProjectileLayer)
                 {
@@ -144,7 +150,8 @@ public class ControlableSpellCastState : State<Controlable>
                     player.SpellParticleRenderer.material = player.ControlMaterial;
                     player.SpellParticleSystem.transform.position = crate.transform.position;
                     player.SpellParticleSystem.Play();
-                    crate.Lunch(crate.transform.position, crate.LaunchPosition, 1.0f);
+                    crate.Lunch(crate.transform.position, crate.LaunchTransform.position, owner.transform, 1.0f);
+                    player.CastSpell();
                 }
                 else if (layer.value == movingPlatformLayer)
                 { 
@@ -153,6 +160,7 @@ public class ControlableSpellCastState : State<Controlable>
                     player.SpellParticleSystem.transform.position = platform.transform.position;
                     player.SpellParticleSystem.Play();
                     platform.MoveFrom(owner.transform.position);
+                    player.CastSpell();
                 }
 
             }

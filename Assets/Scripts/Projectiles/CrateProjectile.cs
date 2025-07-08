@@ -3,14 +3,17 @@ using UnityEngine;
 
 public class CrateProjectile : Projectile
 {
-    private Rigidbody body;
-    private Vector3 launchPosition;
+    [SerializeField] private LayerMask ignoreLayer;
+    public Transform LaunchTransform { get; private set; }
+    public Rigidbody Body { get; private set; }
+    public Collider Collision { get; private set; }
 
-    public Vector3 LaunchPosition => launchPosition;
+    private bool canMakeDamage = false;
 
     private void Awake()
     {
-        body = GetComponent<Rigidbody>();
+        Body = GetComponent<Rigidbody>();
+        Collision = Body.GetComponent<Collider>();
     }
 
     private void OnDestroy()
@@ -18,14 +21,23 @@ public class CrateProjectile : Projectile
         StopAllCoroutines();
     }
 
-    public void Lunch(Vector3 startPosition, Vector3 targetPosition, float timeToTarget)
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (!Utils.CheckCollisionLayer(collision.gameObject, ignoreLayer))
+        {
+            canMakeDamage = false;
+        }
+    }
+
+    public void Lunch(Vector3 startPosition, Vector3 targetPosition, Transform luchTransform, float timeToTarget)
     {
         StartCoroutine(Lifetime());
 
-        launchPosition = startPosition;
+        canMakeDamage = true;
+        this.LaunchTransform = luchTransform;
 
-        body.position = startPosition;
-        body.velocity = Vector3.zero;
+        Body.position = startPosition;
+        Body.velocity = Vector3.zero;
 
         Vector3 relPosition = targetPosition - startPosition;
         
@@ -42,12 +54,17 @@ public class CrateProjectile : Projectile
         float v0x = (x - x0) / t;
         float v0y = (y - y0 - (0.5f * Physics.gravity.y * t * t)) / t;
 
-        body.velocity = right * v0x + up * v0y; ;
+        Body.velocity = right * v0x + up * v0y; ;
     }
 
     private IEnumerator Lifetime()
     {
         yield return new WaitForSeconds(20.0f);
         SendReleaseEvent();
+    }
+
+    public bool CanMakeDamage()
+    {
+        return canMakeDamage;
     }
 }

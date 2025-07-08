@@ -35,6 +35,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6994751934410904407}
+  - {fileID: 977110315053797400}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5042792203881075800
@@ -49,9 +50,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 297508e1ed033ee4c9561644511f9518, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  life: 20
+  life: 4
+  damageMask:
+    serializedVersion: 2
+    m_Bits: 64
   hand: {fileID: 1710726843308798490}
+  <Aim>k__BackingField: {fileID: 977110315053797400}
   attackRadio: 30
+  <Clips>k__BackingField: {fileID: 11400000, guid: c87716e8d7c682b44a0ec1e281f470cf, type: 2}
+  <SkinnedMeshRenderer>k__BackingField: {fileID: 665691039335304182}
 --- !u!114 &7630009740349067614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,6 +144,37 @@ CapsuleCollider:
   m_Height: 2.520155
   m_Direction: 1
   m_Center: {x: 0, y: 1.2399225, z: 0}
+--- !u!1 &7183626260221872195
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 977110315053797400}
+  m_Layer: 7
+  m_Name: AimTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &977110315053797400
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7183626260221872195}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 2.06, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6944017262522047377}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &7392905828005885116
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -194,6 +232,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b3b3d4a9af9a4324887ecea13050dc82, type: 3}
+--- !u!137 &665691039335304182 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1178286313342140598, guid: b3b3d4a9af9a4324887ecea13050dc82, type: 3}
+  m_PrefabInstance: {fileID: 7392905828005885116}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1710726843308798490 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -1070350730909333850, guid: b3b3d4a9af9a4324887ecea13050dc82, type: 3}

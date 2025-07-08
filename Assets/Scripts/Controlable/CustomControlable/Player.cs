@@ -1,13 +1,33 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : CustomControlable
+public class Player : CustomControlable, IDamagable
 {
+    public static event Action<int, int> onLifeChange;
+    public static event Action<float, float> onManaChange;
+
+    public static event Action<Player> onPlayerKill;
+
+    [SerializeField] private int life = 10;
+    [SerializeField] private float mana = 1;
+    [SerializeField] private LayerMask damagableMask;
     [SerializeField] private ParticleSystem aimParticleSystem;
     [SerializeField] private ParticleSystem spellParticleSystem;
     [SerializeField] private Material idleMaterial;
     [SerializeField] private Material controlMaterial;
     [SerializeField] private Material attackMaterial;
+    [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
+
+    public int Life => life;
+    private int maxLife;
+
+    public float Mana => mana;
+    private float maxMana;
+
+    private bool isHit = false;
+    private float time = 0;
     public ParticleSystem AimParticleSystem => aimParticleSystem;
     public ParticleSystem SpellParticleSystem => spellParticleSystem;
     public Material IdleMaterial => idleMaterial;
@@ -27,9 +47,48 @@ public class Player : CustomControlable
         spellParticleSystem.gameObject.transform.parent = gameObject.transform.parent;
     }
 
+    private void Start()
+    {
+        maxLife = life;
+        onLifeChange?.Invoke(life, maxLife);
+
+        maxMana = mana;
+        onManaChange?.Invoke(mana, maxMana);
+    }
+
     private void OnDestroy()
     {
         Enemy.onEnemySpawn -= OnEnemySpawn;
+        StopAllCoroutines();
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (isHit)
+        {
+            return;
+        }
+
+        if (Utils.CheckCollisionLayer(collision.gameObject, damagableMask))
+        {
+            CrateProjectile crate = collision.gameObject.GetComponent<CrateProjectile>();
+            if (crate.CanMakeDamage())
+            {
+                TakeDamage(1);
+            }
+        }
+    }
+
+    private void Update()
+    {
+        if (isHit)
+        {
+            time += Time.deltaTime;
+            skinnedMeshRenderer.material.SetColor("_Tint", Color.Lerp(Color.black, Color.red, Mathf.Sin(time * 40)));
+        }
+
+        mana = Mathf.Clamp(mana + Time.deltaTime*0.5f, 0.0f, maxMana);
+        onManaChange?.Invoke(mana, maxMana);
     }
 
     public override void Initialize(Controlable controlable)
@@ -61,5 +120,31 @@ public class Player : CustomControlable
     private void OnEnemySpawn(Enemy enemy)
     {
         enemy.SetTarget(transform);
+    }
+
+    public void TakeDamage(int amount)
+    {
+        life = Mathf.Max(life - amount, 0);
+        onLifeChange?.Invoke(life, maxLife);
+        StartCoroutine(HitAnimation(2));
+        if (life == 0)
+        {
+            onPlayerKill?.Invoke(this);
+        }
+    }
+
+    IEnumerator HitAnimation(float seconds)
+    {
+        time = 0;
+        isHit = true;
+        yield return new WaitForSeconds(seconds);
+        isHit = false;
+        skinnedMeshRenderer.material.SetColor("_Tint", Color.black);
+    }
+
+    public void CastSpell()
+    {
+        mana -= 1.0f;
+        onManaChange?.Invoke(mana, maxMana);
     }
 }

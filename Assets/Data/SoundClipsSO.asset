@@ -13,3 +13,8 @@ MonoBehaviour:
   m_Name: SoundClipsSO
   m_EditorClassIdentifier: 
   music: {fileID: 0}
+  monsterIdle: {fileID: 8300000, guid: c4699cf01553509409bab70ce258f59a, type: 3}
+  monsterHit: {fileID: 8300000, guid: 7acec6b448057d443989e971f47ae266, type: 3}
+  monsterAttack: {fileID: 8300000, guid: 4cf0a7b615b8d09419b012326937571b, type: 3}
+  monsterDead: {fileID: 8300000, guid: 905fb96ca86d73140983aa7e1c980f3c, type: 3}
+  monsterStep: {fileID: 8300000, guid: 2ec14f44452d55e48bf485143a127879, type: 3}
