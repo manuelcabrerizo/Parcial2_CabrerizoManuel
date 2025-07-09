@@ -10,6 +10,7 @@ public class GameOverState : State<GameManager>
 
     public override void OnEnter()
     {
+        AudioManager.onPauseAll?.Invoke();
         Cursor.lockState = CursorLockMode.None;
         onGameOverStateEnter?.Invoke();
         Time.timeScale = 0.0f;
@@ -17,6 +18,7 @@ public class GameOverState : State<GameManager>
 
     public override void OnExit() 
     {
+        AudioManager.onResumeAll?.Invoke();
         onGameOverStateExit?.Invoke();
         Time.timeScale = 1.0f;
         Cursor.lockState = CursorLockMode.Locked;

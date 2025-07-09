@@ -37,6 +37,10 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         winState = new WinState(this);
         gameOverState = new GameOverState(this);
 
+    }
+
+    private void Start()
+    {
         fsm.PushState(playingState);
     }
 

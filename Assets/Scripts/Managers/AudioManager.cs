@@ -26,7 +26,7 @@ public class AudioManager : MonoBehaviour
     private AudioSource musicAudioSource;
     private IObjectPool<AudioSource> pool;
 
-    private void Start()
+    private void Awake()
     {
         UISettings.onMusicSliderChange += OnMusicSliderChange;
         UISettings.onSfxSliderChange += OnSfxSliderChange;
@@ -38,19 +38,23 @@ public class AudioManager : MonoBehaviour
         onPlayClip += PlayClip;
         onPlayClip3D += PlayClip3D;
 
-        mixer.SetFloat("SfxVolume", Utils.LinearToDecibel(volumeData.Sfx));
-        mixer.SetFloat("MusicVolume", Utils.LinearToDecibel(volumeData.Music));
-        mixer.SetFloat("MasterVolume", Utils.LinearToDecibel(volumeData.Master));
-
         musicAudioSource = GetComponent<AudioSource>();
         pool = new ObjectPool<AudioSource>(
             CreateAudioSource, OnGetFromPool, OnReleaseToPool, OnDestroyPooledObject,
             collectionCheck, defaultCapacity, maxSize);
 
-        //musicAudioSource.clip = soundClips.music;
-        //musicAudioSource.loop = true;
-        //musicAudioSource.Stop();
+        musicAudioSource.clip = soundClips.music;
+        musicAudioSource.loop = true;
+        musicAudioSource.Stop();
     }
+
+    private void Start()
+    {
+        mixer.SetFloat("SfxVolume", Utils.LinearToDecibel(volumeData.Sfx));
+        mixer.SetFloat("MusicVolume", Utils.LinearToDecibel(volumeData.Music));
+        mixer.SetFloat("MasterVolume", Utils.LinearToDecibel(volumeData.Master));
+    }
+
     private void OnDestroy()
     {
         UISettings.onMusicSliderChange -= OnMusicSliderChange;

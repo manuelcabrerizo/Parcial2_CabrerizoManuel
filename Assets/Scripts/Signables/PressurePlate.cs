@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class PressurePlate : Signable
 {
+    [SerializeField] private SoundClipsSO clips;
     [SerializeField] private Transform buttonTransform;
     private Vector3 restPosition;
     private Vector3 pressPosition;
@@ -18,6 +19,7 @@ public class PressurePlate : Signable
     {
         buttonTransform.position = pressPosition;
         isPressed = true;
+        AudioManager.onPlayClip3D(clips.onPressurePlate, transform.position, 10, 40);
     }
 
     private void OnTriggerStay(Collider other)

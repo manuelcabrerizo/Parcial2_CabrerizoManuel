@@ -11,4 +11,11 @@ public class SoundClipsSO : ScriptableObject
     public AudioClip monsterAttack;
     public AudioClip monsterDead;
     public AudioClip monsterStep;
+
+    public AudioClip[] footSteps;
+
+    public AudioClip spell;
+    public AudioClip onHit;
+    public AudioClip onPressurePlate;
+    public AudioClip onRingCatch;
 }

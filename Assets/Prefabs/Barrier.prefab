@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4364555555445499742}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Barrier
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -47,7 +47,7 @@ GameObject:
   - component: {fileID: 8346139626023992051}
   - component: {fileID: 1478417831315500125}
   - component: {fileID: 2998518723025893382}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -81,8 +81,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: beffc24c38a72904181d3943a8f4727b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pressurePlates:
-  - {fileID: 0}
+  signables: []
   cameraTransform: {fileID: 4420939219099650990}
   effectLight: {fileID: 7473285373547573218}
 --- !u!33 &8346139626023992051
@@ -168,7 +167,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4283739877622726659}
   - component: {fileID: 7473285373547573218}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -260,7 +259,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4420939219099650990}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: CameraPosition
   m_TagString: Untagged
   m_Icon: {fileID: 0}

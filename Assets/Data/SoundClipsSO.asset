@@ -12,9 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d312e1f54564484c94cc108f27f5c12, type: 3}
   m_Name: SoundClipsSO
   m_EditorClassIdentifier: 
-  music: {fileID: 0}
+  music: {fileID: 8300000, guid: b5f1c0a89fdcdce4cb76ce163971e051, type: 3}
   monsterIdle: {fileID: 8300000, guid: c4699cf01553509409bab70ce258f59a, type: 3}
   monsterHit: {fileID: 8300000, guid: 7acec6b448057d443989e971f47ae266, type: 3}
   monsterAttack: {fileID: 8300000, guid: 4cf0a7b615b8d09419b012326937571b, type: 3}
   monsterDead: {fileID: 8300000, guid: 905fb96ca86d73140983aa7e1c980f3c, type: 3}
   monsterStep: {fileID: 8300000, guid: 2ec14f44452d55e48bf485143a127879, type: 3}
+  footSteps:
+  - {fileID: 8300000, guid: 37ea23c07bc60f24eb0475a7c80fc6fc, type: 3}
+  - {fileID: 8300000, guid: b0fa5454185c2ad4bac67c33a260ff2a, type: 3}
+  - {fileID: 8300000, guid: 3d1201c401774b34282b8b0af0fc93a6, type: 3}
+  spell: {fileID: 8300000, guid: d355e64a78fb7154faea553a56454975, type: 3}
+  onHit: {fileID: 8300000, guid: 1395479443de15d4fabb8510b3ae3a8f, type: 3}
+  onPressurePlate: {fileID: 8300000, guid: 74525810931385f4d9f2248ec0e9a265, type: 3}
+  onRingCatch: {fileID: 8300000, guid: 2d9b0a0be927291468da70b6635b5b17, type: 3}

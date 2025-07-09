@@ -9,10 +9,11 @@ public class PlayingState : State<GameManager>
     public override void OnEnter()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        AudioManager.onPlayMusic?.Invoke();
     }
 
     public override void OnExit()
     {
-
+        AudioManager.onPauseMusic?.Invoke();
     }
 }

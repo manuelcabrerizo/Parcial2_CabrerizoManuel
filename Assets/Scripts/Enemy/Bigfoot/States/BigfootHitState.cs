@@ -10,16 +10,14 @@ public class BigfootHitState : State<Bigfoot>
 
     public override void OnEnter()
     {
-        Debug.Log("Hit OnEnter");
         time = 0;
         owner.Animator.SetTrigger("Hit");
-        AudioManager.onPlayClip3D?.Invoke(owner.Clips.monsterHit, owner.transform.position, 100, 400);
+        AudioManager.onPlayClip3D?.Invoke(owner.Clips.monsterHit, owner.transform.position, 1, 20);
     }
 
     public override void OnExit()
     {
         owner.SkinnedMeshRenderer.material.SetColor("_Tint", Color.black);
-        Debug.Log("Hit OnExit");
     }
 
     public override void OnUpdate()

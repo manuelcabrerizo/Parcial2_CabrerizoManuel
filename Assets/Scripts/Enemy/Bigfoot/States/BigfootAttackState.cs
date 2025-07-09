@@ -9,9 +9,7 @@ public class BigfootAttackState : State<Bigfoot>
         : base(owner, enterCondition, exitCondition) { }
 
     public override void OnEnter()
-    {
-        Debug.Log("Attack OnEnter");
-
+    { 
         Bigfoot.onSpawnCrate += OnSpawnCrate;
         Bigfoot.onLunchCrate += OnLunchCrate;
         owner.Animator.SetBool("IsAttaking", true);
@@ -19,7 +17,11 @@ public class BigfootAttackState : State<Bigfoot>
 
     public override void OnExit()
     {
-        Debug.Log("Attack OnExit");
+        if (holdingCrate != null)
+        {
+            holdingCrate.SendReleaseEvent();
+            holdingCrate = null;
+        }
 
         Bigfoot.onSpawnCrate -= OnSpawnCrate;
         Bigfoot.onLunchCrate -= OnLunchCrate;

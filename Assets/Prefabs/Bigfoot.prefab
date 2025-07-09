@@ -50,6 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 297508e1ed033ee4c9561644511f9518, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clips: {fileID: 11400000, guid: c87716e8d7c682b44a0ec1e281f470cf, type: 2}
   life: 4
   damageMask:
     serializedVersion: 2

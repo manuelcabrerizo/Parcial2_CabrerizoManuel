@@ -163,7 +163,7 @@ public class Bigfoot : Enemy
 
     public void StartRoar()
     {
-        AudioManager.onPlayClip3D?.Invoke(Clips.monsterAttack, transform.position, 100, 400);
+        AudioManager.onPlayClip3D?.Invoke(Clips.monsterAttack, transform.position, 1, 20);
     }
 
     public void Kill()
@@ -182,6 +182,6 @@ public class Bigfoot : Enemy
 
     public void MakeStepSound()
     {
-        AudioManager.onPlayClip3D?.Invoke(Clips.monsterStep, transform.position, 100, 400);
+        AudioManager.onPlayClip3D?.Invoke(Clips.monsterStep, transform.position, 1, 20);
     }
 }

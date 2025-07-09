@@ -12,6 +12,7 @@ public class CameraMovement : MonoBehaviour
     [SerializeField] private LayerMask wallLayer;
 
     private float yaw = 0;
+    private Vector3 currentStartDirection;
     private float currentHeightRatio;
     private bool isAiming = false;
     private bool isPaused = false;
@@ -24,6 +25,7 @@ public class CameraMovement : MonoBehaviour
         Controlable.onControlableCreated += SetTarget;
         PauseState.onPauseStateEnter += OnPauseStateEnter;
         PauseState.onPauseStateExit += OnPauseStateExit;
+        currentStartDirection = new Vector3(0.0f, 0.0f, -1.0f);
     }
 
     private void OnDestroy()
@@ -56,7 +58,7 @@ public class CameraMovement : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = -Input.GetAxis("Mouse Y");
 
-        yaw += mouseX * 1.0f;
+        yaw += mouseX;
 
 
         if (Input.GetMouseButton(0))
@@ -70,11 +72,11 @@ public class CameraMovement : MonoBehaviour
             isAiming = false;
         }
 
-        Vector3 direction = new Vector3(0.0f, 0.0f, -1.0f);
-        direction = Quaternion.AngleAxis(yaw, Vector3.up) * direction;
+        
+        Vector3 direction = Quaternion.AngleAxis(yaw, Vector3.up) * currentStartDirection;
         direction.Normalize();
 
-        Vector3 target = goTraget.transform.position + (direction + Vector3.up * currentHeightRatio).normalized * distance;
+        Vector3 target = goTraget.transform.position + (-direction + Vector3.up * currentHeightRatio).normalized * distance;
 
         Vector3 viewPosition = goTraget.transform.position;
         target += Vector3.up * yOffset;
@@ -110,6 +112,11 @@ public class CameraMovement : MonoBehaviour
     {
         goTraget = controlable.gameObject;
         onCameraCreate?.Invoke(this);
+
+        yaw = 0;
+        currentStartDirection = goTraget.transform.forward;
+        currentStartDirection.y = 0;
+        currentStartDirection.Normalize();
     }
 
     private void OnPauseStateEnter()

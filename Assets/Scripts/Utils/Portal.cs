@@ -11,7 +11,12 @@ public class Portal : MonoBehaviour
     [SerializeField] private Transform targetTransform;
 
     private void OnTriggerEnter(Collider other)
-    {        
+    {
+        if (!other.gameObject.TryGetComponent<Player>(out _))
+        {
+            return;
+        }
+
         if (isPortalToMain)
         {
             onPortalToMainEnter?.Invoke(other.gameObject, targetTransform);

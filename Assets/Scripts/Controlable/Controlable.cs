@@ -39,7 +39,6 @@ public class Controlable : MonoBehaviour
 
     private void Update()
     {
-        ProcessRotation();
         ProcessControlableData();
         StateGraph.Update();
         ProcessBreakFree();
@@ -48,6 +47,11 @@ public class Controlable : MonoBehaviour
     private void FixedUpdate()
     {
         StateGraph.FixedUpdate();
+    }
+
+    private void LateUpdate()
+    {
+        ProcessRotation();
     }
 
     private void Initialize()
@@ -84,10 +88,10 @@ public class Controlable : MonoBehaviour
     }
 
     private void ProcessRotation()
-    {
-        Vector3 forward = Data.body.transform.forward;
-        Vector3 right = Data.body.transform.right;
-        Data.body.transform.rotation = Quaternion.Euler(0.0f, Data.cameraMovement.GetYaw(), 0.0f);
+    {   Vector3 forward = Data.cam.transform.forward;
+        forward.y = 0;
+        forward.Normalize();
+        Data.body.transform.rotation = Quaternion.LookRotation(forward);
     }
 
     private void ProcessControlableData()
@@ -115,7 +119,7 @@ public class Controlable : MonoBehaviour
         {
             Data.animator.SetBool("IsGrounded", Data.isGrounded);
         }
-        Data.body.useGravity = !Data.isGrounded;
+        //Data.body.useGravity = !Data.isGrounded;
 
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");
@@ -143,8 +147,12 @@ public class Controlable : MonoBehaviour
     {
         if (Data.prevControlable != null)
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            if (Input.GetKeyDown(KeyCode.Q))
             {
+                if (TryGetComponent<Player>(out _))
+                {
+                    return;
+                }
                 Controlable newControlable = Data.prevControlable.AddComponent<Controlable>();
                 newControlable.SetPrevControlable(this.gameObject);
                 BreakFree();

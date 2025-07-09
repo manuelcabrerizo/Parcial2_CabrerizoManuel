@@ -69,7 +69,11 @@ public class ControlableSpellCastState : State<Controlable>
         // Change Color
         Ray aimRay = data.cam.ScreenPointToRay(new Vector2(data.mousePosX, data.mousePosY));
         RaycastHit hit;
-        if (Physics.Raycast(aimRay, out hit))
+        if (player.Mana < 1.0f)
+        {
+            player.ParticleRenderer.material = player.IdleMaterial;
+        } 
+        else if (Physics.Raycast(aimRay, out hit))
         {
             GameObject go = hit.collider.gameObject;
             LayerMask layer = go.layer;
@@ -120,6 +124,7 @@ public class ControlableSpellCastState : State<Controlable>
         if (Physics.Raycast(aimRay, out hit))
         {
             GameObject go = hit.collider.gameObject;
+
             LayerMask layer = go.layer;
             if (go != data.body.gameObject)
             {
@@ -133,6 +138,7 @@ public class ControlableSpellCastState : State<Controlable>
                     newControlable.SetPrevControlable(owner.gameObject);
                     owner.BreakFree();
                     player.CastSpell();
+                    AudioManager.onPlayClip3D(player.Clips.spell, go.transform.position, 10, 40);
                 }
                 else if (layer.value == enemyLayer)
                 {
@@ -143,6 +149,7 @@ public class ControlableSpellCastState : State<Controlable>
                     player.SpellParticleSystem.Play();
                     enemy.TakeDamage(1);
                     player.CastSpell();
+                    AudioManager.onPlayClip3D(player.Clips.spell, go.transform.position, 10, 40);
                 }
                 else if (layer.value == crateProjectileLayer)
                 {
@@ -152,6 +159,7 @@ public class ControlableSpellCastState : State<Controlable>
                     player.SpellParticleSystem.Play();
                     crate.Lunch(crate.transform.position, crate.LaunchTransform.position, owner.transform, 1.0f);
                     player.CastSpell();
+                    AudioManager.onPlayClip3D(player.Clips.spell, go.transform.position, 10, 40);
                 }
                 else if (layer.value == movingPlatformLayer)
                 { 
@@ -161,6 +169,7 @@ public class ControlableSpellCastState : State<Controlable>
                     player.SpellParticleSystem.Play();
                     platform.MoveFrom(owner.transform.position);
                     player.CastSpell();
+                    AudioManager.onPlayClip3D(player.Clips.spell, go.transform.position, 10, 40);
                 }
 
             }

@@ -5,30 +5,31 @@ using UnityEngine.UI;
 public class UIMainMenu : MonoBehaviour
 {
     [SerializeField] private Button playButton;
-    [SerializeField] private Button controlsButton;
     [SerializeField] private Button creditsButton;
     [SerializeField] private Button exitButton;
     [SerializeField] private GameObject loadingBar;
     [SerializeField] private Image lodingBarImage;
 
+    [SerializeField] private GameObject creditsPanel;
+    [SerializeField] private Button creditsBackButton;
+
     private void Awake()
     {
         Cursor.lockState = CursorLockMode.None;
         playButton.onClick.AddListener(OnPlayButtonClick);
-        controlsButton.onClick.AddListener(OnControlsButtonClick);
         creditsButton.onClick.AddListener(OnCreditsButtonClick);
         exitButton.onClick.AddListener(OnExitButtonClick);
+        creditsBackButton.onClick.AddListener(OnCreditsBackButtonClick);
         GameSceneManager.onLoadingBarChange += OnLoadingBarChange;
     }
 
     private void OnDestroy()
     {
         playButton.onClick.RemoveListener(OnPlayButtonClick);
-        controlsButton.onClick.RemoveListener(OnControlsButtonClick);
         creditsButton.onClick.RemoveListener(OnCreditsButtonClick);
         exitButton.onClick.RemoveListener(OnExitButtonClick);
+        creditsBackButton.onClick.RemoveListener(OnCreditsBackButtonClick);
         GameSceneManager.onLoadingBarChange -= OnLoadingBarChange;
-
     }
 
     private void OnPlayButtonClick()
@@ -37,14 +38,9 @@ public class UIMainMenu : MonoBehaviour
         GameSceneManager.Instance.ChangeSceneTo("Main", LoadSceneMode.Single);
     }
 
-    private void OnControlsButtonClick()
-    {
-        SceneManager.LoadScene("Controls");
-    }
-
     private void OnCreditsButtonClick()
     {
-        SceneManager.LoadScene("Credits");
+        creditsPanel.SetActive(true);
     }
 
     private void OnExitButtonClick()
@@ -62,4 +58,12 @@ public class UIMainMenu : MonoBehaviour
     {
         lodingBarImage.fillAmount = value;
     }
+
+
+    private void OnCreditsBackButtonClick()
+    {
+        creditsPanel.SetActive(false);
+    }
+
+
 }

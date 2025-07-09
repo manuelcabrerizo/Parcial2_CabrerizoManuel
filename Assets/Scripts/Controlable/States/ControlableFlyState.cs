@@ -8,7 +8,6 @@ public class ControlableFlyState : State<Controlable>
 
     public override void OnEnter()
     {
-        Debug.Log("Fly OnEnter");
         ControlableData data = owner.Data;
         data.body.drag = 2.5f;
         data.body.velocity = new Vector3(data.body.velocity.x, 0.0f, data.body.velocity.z);
@@ -19,7 +18,6 @@ public class ControlableFlyState : State<Controlable>
 
     public override void OnExit()
     {
-        Debug.Log("Fly OnExit");
         ControlableData data = owner.Data;
         data.body.useGravity = true;
     }

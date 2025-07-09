@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class Player : CustomControlable, IDamagable
@@ -11,6 +12,7 @@ public class Player : CustomControlable, IDamagable
     public static event Action<Player> onPlayerWin;
     public static event Action<Player> onPlayerKill;
 
+    [field: SerializeField] public SoundClipsSO Clips { get; private set; }
     [SerializeField] private int life = 10;
     [SerializeField] private float mana = 1;
     [SerializeField] private LayerMask damagableMask;
@@ -21,6 +23,7 @@ public class Player : CustomControlable, IDamagable
     [SerializeField] private Material controlMaterial;
     [SerializeField] private Material attackMaterial;
     [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
+    [SerializeField] private Transform foot;
 
     public int Life => life;
     private int maxLife;
@@ -29,7 +32,12 @@ public class Player : CustomControlable, IDamagable
     private float maxMana;
 
     private bool isHit = false;
-    private float time = 0;
+    private float hitTime = 0;
+
+    private float footStepTime = 0;
+
+    private Controlable controlable;
+
     public ParticleSystem AimParticleSystem => aimParticleSystem;
     public ParticleSystem SpellParticleSystem => spellParticleSystem;
     public Material IdleMaterial => idleMaterial;
@@ -41,10 +49,12 @@ public class Player : CustomControlable, IDamagable
     private void Awake()
     {
         Enemy.onEnemySpawn += OnEnemySpawn;
+        Controlable.onControlableCreated += OnControlableCreated;
 
         ParticleRenderer = AimParticleSystem.GetComponent<ParticleSystemRenderer>();
         SpellParticleRenderer = SpellParticleSystem.GetComponent<ParticleSystemRenderer>();
         ParticleRenderer.material = IdleMaterial;
+        controlable = GetComponent<Controlable>();
         // take this game object out of the player, so its position is relative to the world not the player
         spellParticleSystem.gameObject.transform.parent = gameObject.transform.parent;
     }
@@ -61,6 +71,8 @@ public class Player : CustomControlable, IDamagable
     private void OnDestroy()
     {
         Enemy.onEnemySpawn -= OnEnemySpawn;
+        Controlable.onControlableCreated -= OnControlableCreated;
+
         StopAllCoroutines();
     }
 
@@ -79,8 +91,11 @@ public class Player : CustomControlable, IDamagable
                 TakeDamage(1);
             }
         }
+    }
 
-        if (Utils.CheckCollisionLayer(collision.gameObject, bookLayer))
+    private void OnTriggerEnter(Collider other)
+    {
+        if (Utils.CheckCollisionLayer(other.gameObject, bookLayer))
         {
             onPlayerWin?.Invoke(this);
         }
@@ -90,12 +105,14 @@ public class Player : CustomControlable, IDamagable
     {
         if (isHit)
         {
-            time += Time.deltaTime;
-            skinnedMeshRenderer.material.SetColor("_Tint", Color.Lerp(Color.black, Color.red, Mathf.Sin(time * 40)));
+            hitTime += Time.deltaTime;
+            skinnedMeshRenderer.material.SetColor("_Tint", Color.Lerp(Color.black, Color.red, Mathf.Sin(hitTime * 40)));
         }
 
         mana = Mathf.Clamp(mana + Time.deltaTime*0.5f, 0.0f, maxMana);
         onManaChange?.Invoke(mana, maxMana);
+
+        PlayAudio();
     }
 
     public override void Initialize(Controlable controlable)
@@ -131,6 +148,7 @@ public class Player : CustomControlable, IDamagable
 
     public void TakeDamage(int amount)
     {
+        AudioManager.onPlayClip3D(Clips.onHit, transform.position, 1, 4);
         life = Mathf.Max(life - amount, 0);
         onLifeChange?.Invoke(life, maxLife);
         StartCoroutine(HitAnimation(2));
@@ -142,7 +160,7 @@ public class Player : CustomControlable, IDamagable
 
     IEnumerator HitAnimation(float seconds)
     {
-        time = 0;
+        hitTime = 0;
         isHit = true;
         yield return new WaitForSeconds(seconds);
         isHit = false;
@@ -154,4 +172,80 @@ public class Player : CustomControlable, IDamagable
         mana -= 1.0f;
         onManaChange?.Invoke(mana, maxMana);
     }
+
+    private void PlayAudio()
+    {
+        ControlableData data = controlable.Data;
+        Vector2 move = new Vector2(data.xInput, data.yInput);
+        if (data.isGrounded && move.magnitude > 0.01f)
+        {
+            footStepTime += Time.deltaTime;
+            if (footStepTime > 0.4f)
+            {
+                PlayFootSteps();
+                footStepTime = 0.0f;
+            }
+        }
+        else
+        {
+            footStepTime = 0.0f;
+        }
+    }
+
+    private void PlayFootSteps()
+    {
+        AudioClip clip = Clips.footSteps[2];
+        if (Terrain.activeTerrain)
+        {
+
+            Terrain terrain = Terrain.activeTerrain;
+            Vector3 pos = GetMapPos();
+
+            int mapX = Mathf.FloorToInt(pos.x * terrain.terrainData.alphamapWidth);
+            int mapZ = Mathf.FloorToInt(pos.z * terrain.terrainData.alphamapHeight);
+
+            float[,,] splatmapData = terrain.terrainData.GetAlphamaps(mapX, mapZ, 1, 1);
+            int maxTextures = terrain.terrainData.alphamapLayers;
+
+            float maxValue = 0.0f;
+            int index = 0;
+            for (int i = 0; i < maxTextures; ++i)
+            {
+                if (splatmapData[0, 0, i] > maxValue)
+                {
+                    maxValue = splatmapData[0, 0, i];
+                    index = i;
+                }
+            }
+            switch (index)
+            {
+                case 0: clip = Clips.footSteps[0]; break;
+                case 2: clip = Clips.footSteps[1]; break;
+            }
+            AudioManager.onPlayClip3D(clip, foot.position, 1, 4);
+        }
+        else
+        {
+            AudioManager.onPlayClip3D(clip, foot.position, 1, 4);
+        }
+    }
+
+    private Vector3 GetMapPos()
+    {
+        ControlableData data = controlable.Data;
+        Vector3 pos = data.body.position;
+        Terrain terrain = Terrain.activeTerrain;
+        return new Vector3((pos.x - terrain.transform.position.x) / terrain.terrainData.size.x,
+                           0,
+                           (pos.z - terrain.transform.position.z) / terrain.terrainData.size.z);
+    }
+
+    private void OnControlableCreated(Controlable controlable)
+    {
+        if (controlable.TryGetComponent<Player>(out _))
+        {
+            this.controlable = controlable;
+        }
+    }
+
 }

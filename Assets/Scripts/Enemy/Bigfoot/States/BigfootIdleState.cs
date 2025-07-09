@@ -8,12 +8,6 @@ public class BigfootIdleState : State<Bigfoot>
 
     public override void OnEnter()
     {
-        Debug.Log("Idle OnEnter");
         owner.Animator.SetBool("IsAttaking", false);
-    }
-
-    public override void OnExit()
-    {
-        Debug.Log("Idle OnExit");
     }
 }
