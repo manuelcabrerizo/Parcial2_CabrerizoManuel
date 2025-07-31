@@ -11,7 +11,7 @@ public class PauseState : State<GameManager>
 
     public override void OnEnter()
     {
-        AudioManager.onPauseAll?.Invoke();
+        AudioManager.onPauseMusic?.Invoke();
         Cursor.lockState = CursorLockMode.None;
         onPauseStateEnter?.Invoke();
         Time.timeScale = 0.0f;
@@ -19,7 +19,7 @@ public class PauseState : State<GameManager>
 
     public override void OnExit()
     {
-        AudioManager.onResumeAll?.Invoke();
+        AudioManager.onPlayMusic?.Invoke();
         onPauseStateExit?.Invoke();
         Time.timeScale = 1.0f;
         Cursor.lockState = CursorLockMode.Locked;

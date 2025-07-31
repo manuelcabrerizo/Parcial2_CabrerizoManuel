@@ -25,6 +25,7 @@ public class CameraMovement : MonoBehaviour
         Controlable.onControlableCreated += SetTarget;
         PauseState.onPauseStateEnter += OnPauseStateEnter;
         PauseState.onPauseStateExit += OnPauseStateExit;
+        GameManager.onResetCamera += OnRestart;
         currentStartDirection = new Vector3(0.0f, 0.0f, -1.0f);
     }
 
@@ -33,6 +34,7 @@ public class CameraMovement : MonoBehaviour
         Controlable.onControlableCreated -= SetTarget;
         PauseState.onPauseStateEnter -= OnPauseStateEnter;
         PauseState.onPauseStateExit -= OnPauseStateExit;
+        GameManager.onResetCamera -= OnRestart;
     }
 
     private void Start()
@@ -113,6 +115,11 @@ public class CameraMovement : MonoBehaviour
         goTraget = controlable.gameObject;
         onCameraCreate?.Invoke(this);
 
+        OnRestart();
+    }
+
+    public void OnRestart()
+    {
         yaw = 0;
         currentStartDirection = goTraget.transform.forward;
         currentStartDirection.y = 0;

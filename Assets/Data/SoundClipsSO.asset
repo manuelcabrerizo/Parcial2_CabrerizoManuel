@@ -26,3 +26,4 @@ MonoBehaviour:
   onHit: {fileID: 8300000, guid: 1395479443de15d4fabb8510b3ae3a8f, type: 3}
   onPressurePlate: {fileID: 8300000, guid: 74525810931385f4d9f2248ec0e9a265, type: 3}
   onRingCatch: {fileID: 8300000, guid: 2d9b0a0be927291468da70b6635b5b17, type: 3}
+  select: {fileID: 8300000, guid: 321a1010d1025bc4fb6888543ffe9848, type: 3}

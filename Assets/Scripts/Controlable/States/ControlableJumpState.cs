@@ -11,7 +11,7 @@ public class ControlableJumpState : State<Controlable>
         ControlableData data = owner.Data;
         data.body.drag = 0;
         data.body.velocity = new Vector3(data.body.velocity.x, 0.0f, data.body.velocity.z);
-        data.body.AddForce(Vector3.up * 8.0f, ForceMode.Impulse);
+        data.body.AddForce(Vector3.up * 8.0f * Time.timeScale, ForceMode.Impulse);
         data.currentJumpDone++;
     }
 

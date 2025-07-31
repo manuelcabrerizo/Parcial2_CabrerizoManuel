@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
+    public static Action onResetCamera;
     public static Action<bool> onShowLoadingBar;
 
     private Controlable controlable = null;
@@ -124,6 +125,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         {
             controlable.transform.position = targetTransform.position;
             controlable.transform.rotation = targetTransform.rotation;
+            onResetCamera?.Invoke();
             GameSceneManager.onLoadingCompleted += OnSceneUnloadingComplete;
             GameSceneManager.Instance.UnloadScene(currentLoadedSceneName);
             onShowLoadingBar?.Invoke(true);
@@ -136,6 +138,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         onShowLoadingBar?.Invoke(false);
         controlable.transform.position = targetTransform.position;
         controlable.transform.rotation = targetTransform.rotation;
+        onResetCamera?.Invoke();
         GameSceneManager.onLoadingCompleted -= OnSceneLoadingComplete;
     }
 

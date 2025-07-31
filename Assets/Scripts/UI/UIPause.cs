@@ -5,9 +5,8 @@ using UnityEngine.UI;
 public class UIPause : MonoBehaviour
 {
     public static event Action onResumeButtonClick;
+    public static event Action onSettingsButtonClick;
 
-    [SerializeField] private GameObject pausePanel;
-    [SerializeField] private GameObject settingsPanel;
     [SerializeField] private Button resumeButton;
     [SerializeField] private Button settingsButton;
     [SerializeField] private Button menuButton;
@@ -15,26 +14,12 @@ public class UIPause : MonoBehaviour
 
     private void Awake()
     {
-        PauseState.onPauseStateEnter += OnPauseStateEnter;
-        PauseState.onPauseStateExit += OnPauseStateExit;
         SubscribeButtons();
     }
 
     private void OnDestroy()
     {
-        PauseState.onPauseStateEnter -= OnPauseStateEnter;
-        PauseState.onPauseStateExit -= OnPauseStateExit;
         UnsubscribeButtons();
-    }
-
-    private void OnPauseStateEnter()
-    { 
-        pausePanel.SetActive(true);
-    }
-
-    private void OnPauseStateExit()
-    {
-        pausePanel?.SetActive(false);
     }
 
     private void OnResumeButtonClick()
@@ -44,8 +29,7 @@ public class UIPause : MonoBehaviour
 
     private void OnSettingsButtonClick()
     {
-        pausePanel.SetActive(false);
-        settingsPanel.SetActive(true);
+        onSettingsButtonClick?.Invoke();
     }
 
     private void OnMenuButtonClick()

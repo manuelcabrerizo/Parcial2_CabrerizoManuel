@@ -6,10 +6,9 @@ public class UISettings : MonoBehaviour
 {
     public static event Action<float> onMusicSliderChange;
     public static event Action<float> onSfxSliderChange;
+    public static event Action onBackButtonClick;
 
     // Settings ui
-    [SerializeField] private GameObject settingsPanel;
-    [SerializeField] private GameObject pausePanel;
     [SerializeField] private Slider musicSlider;
     [SerializeField] private Slider sfxSlider;
     [SerializeField] private Button backButton;
@@ -45,8 +44,7 @@ public class UISettings : MonoBehaviour
     }
 
     private void OnBackButtonClick()
-    { 
-        settingsPanel.SetActive(false);
-        pausePanel.SetActive(true);
+    {
+        onBackButtonClick?.Invoke();
     }
 }

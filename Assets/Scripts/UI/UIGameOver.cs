@@ -3,38 +3,22 @@ using UnityEngine.UI;
 
 public class UIGameOver : MonoBehaviour
 {
-    [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private Button menuButton;
     [SerializeField] private Button exitButton;
 
     private void Awake()
     {
-        GameOverState.onGameOverStateEnter += OnGameOverStateEnter;
-        GameOverState.onGameOverStateExit += OnGameOverStateExit;
-        menuButton.onClick.AddListener(OnMenuButtonClick);
-        exitButton.onClick.AddListener(OnExitButtonClick);
+        SubscribeButtons();
     }
 
     private void OnDestroy()
     {
-        GameOverState.onGameOverStateEnter -= OnGameOverStateEnter;
-        GameOverState.onGameOverStateExit -= OnGameOverStateExit;
-        menuButton.onClick.RemoveListener(OnMenuButtonClick);
-        exitButton.onClick.RemoveListener(OnExitButtonClick);
-    }
-
-    private void OnGameOverStateEnter()
-    {
-        gameOverPanel.SetActive(true);
-    }
-
-    private void OnGameOverStateExit()
-    {
-        gameOverPanel.SetActive(false);
+        UnsubscribeButtons();
     }
 
     private void OnMenuButtonClick()
     {
+        UnsubscribeButtons();
         GameSceneManager.Instance.ChangeSceneTo("MainMenu", UnityEngine.SceneManagement.LoadSceneMode.Single);
         GameManager.onShowLoadingBar?.Invoke(true);
     }
@@ -48,5 +32,17 @@ public class UIGameOver : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
+    }
+
+    private void SubscribeButtons()
+    {
+        menuButton.onClick.AddListener(OnMenuButtonClick);
+        exitButton.onClick.AddListener(OnExitButtonClick);
+    }
+
+    private void UnsubscribeButtons()
+    {
+        menuButton.onClick.RemoveListener(OnMenuButtonClick);
+        exitButton.onClick.RemoveListener(OnExitButtonClick);
     }
 }

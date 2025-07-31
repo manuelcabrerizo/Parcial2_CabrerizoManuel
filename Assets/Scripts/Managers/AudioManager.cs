@@ -6,8 +6,6 @@ using UnityEngine.Pool;
 
 public class AudioManager : MonoBehaviour
 {
-    public static Action onPauseAll;
-    public static Action onResumeAll;
     public static Action onPlayMusic;
     public static Action onStopMusic;
     public static Action onPauseMusic;
@@ -30,8 +28,6 @@ public class AudioManager : MonoBehaviour
     {
         UISettings.onMusicSliderChange += OnMusicSliderChange;
         UISettings.onSfxSliderChange += OnSfxSliderChange;
-        onPauseAll += PauseAll;
-        onResumeAll += ResumeAll;
         onPlayMusic += PlayMusic;
         onStopMusic += StopMusic;
         onPauseMusic += PauseMusic;
@@ -59,8 +55,6 @@ public class AudioManager : MonoBehaviour
     {
         UISettings.onMusicSliderChange -= OnMusicSliderChange;
         UISettings.onSfxSliderChange -= OnSfxSliderChange;
-        onPauseAll -= PauseAll;
-        onResumeAll -= ResumeAll;
         onPlayMusic -= PlayMusic;
         onStopMusic -= StopMusic;
         onPauseMusic -= PauseMusic;
@@ -107,16 +101,6 @@ public class AudioManager : MonoBehaviour
         audioSource.clip = clip;
         audioSource.Play();
         StartCoroutine(ReleaseAudioSourceIfFinish(audioSource));
-    }
-
-    private void PauseAll()
-    {
-        mixer.SetFloat("MasterVolume", -80);
-    }
-
-    private void ResumeAll()
-    {
-        mixer.SetFloat("MasterVolume", 0);
     }
 
     private IEnumerator ReleaseAudioSourceIfFinish(AudioSource audioSource)

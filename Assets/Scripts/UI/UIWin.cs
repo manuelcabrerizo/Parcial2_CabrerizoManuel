@@ -3,38 +3,22 @@ using UnityEngine.UI;
 
 public class UIWin : MonoBehaviour
 {
-    [SerializeField] private GameObject winPanel;
     [SerializeField] private Button menuButton;
     [SerializeField] private Button exitButton;
 
     private void Awake()
     {
-        WinState.onWinStateEnter += OnWinStateEnter;
-        WinState.onWinStateExit += OnWinStateExit;
-        menuButton.onClick.AddListener(OnMenuButtonClick);
-        exitButton.onClick.AddListener(OnExitButtonClick);
+        SubscribeButtons();
     }
 
     private void OnDestroy()
     {
-        WinState.onWinStateEnter -= OnWinStateEnter;
-        WinState.onWinStateExit -= OnWinStateExit;
-        menuButton.onClick.RemoveListener(OnMenuButtonClick);
-        exitButton.onClick.RemoveListener(OnExitButtonClick);
-    }
-
-    private void OnWinStateEnter()
-    {
-        winPanel.SetActive(true);
-    }
-
-    private void OnWinStateExit() 
-    {
-        winPanel.SetActive(false);
+        UnsubscribeButtons();
     }
 
     private void OnMenuButtonClick()
     {
+        UnsubscribeButtons();
         GameSceneManager.Instance.ChangeSceneTo("MainMenu", UnityEngine.SceneManagement.LoadSceneMode.Single);
         GameManager.onShowLoadingBar?.Invoke(true);
     }
@@ -48,5 +32,17 @@ public class UIWin : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
+    }
+
+    private void SubscribeButtons()
+    {
+        menuButton.onClick.AddListener(OnMenuButtonClick);
+        exitButton.onClick.AddListener(OnExitButtonClick);
+    }
+
+    private void UnsubscribeButtons()
+    {
+        menuButton.onClick.RemoveListener(OnMenuButtonClick);
+        exitButton.onClick.RemoveListener(OnExitButtonClick);
     }
 }

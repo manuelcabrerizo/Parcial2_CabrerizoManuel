@@ -1,80 +1,49 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class UIMainMenu : MonoBehaviour
 {
-    [SerializeField] private Button playButton;
-    [SerializeField] private Button creditsButton;
-    [SerializeField] private Button exitButton;
-    [SerializeField] private GameObject loadingBar;
-    [SerializeField] private Image lodingBarImage;
-
+    [SerializeField] private GameObject menuPanel;
     [SerializeField] private GameObject creditsPanel;
-    [SerializeField] private Button creditsBackButton;
+    [SerializeField] private GameObject settingsPanel;
+
 
     private void Awake()
     {
-        Cursor.lockState = CursorLockMode.None;
-        SubscribeButtons();
-        GameSceneManager.onLoadingBarChange += OnLoadingBarChange;
+        UIMenu.onSettingsButtonClick += OnSettingsButtonClick;
+        UISettings.onBackButtonClick += OnSettingsBackButtonClick;
+        UIMenu.onCreditsButtonClick += OnCreditsButtonClick;
+        UICredits.onBackButtonClick += OnCreditsBackButtonClick;
     }
 
     private void OnDestroy()
     {
-        UnsubscribeButtons();
-        GameSceneManager.onLoadingBarChange -= OnLoadingBarChange;
+        UIMenu.onSettingsButtonClick -= OnSettingsButtonClick;
+        UISettings.onBackButtonClick -= OnSettingsBackButtonClick;
+        UIMenu.onCreditsButtonClick -= OnCreditsButtonClick;
+        UICredits.onBackButtonClick -= OnCreditsBackButtonClick;
     }
 
-    private void OnPlayButtonClick()
+    private void OnSettingsButtonClick()
+    { 
+        settingsPanel.SetActive(true);
+        menuPanel.SetActive(false);
+    }
+
+    private void OnSettingsBackButtonClick()
     {
-        UnsubscribeButtons();
-        loadingBar.SetActive(true);
-        GameSceneManager.Instance.ChangeSceneTo("Main", LoadSceneMode.Single);
+        menuPanel.SetActive(true);
+        settingsPanel.SetActive(false);
     }
 
     private void OnCreditsButtonClick()
     {
         creditsPanel.SetActive(true);
+        menuPanel.SetActive(false);
     }
-
-    private void OnExitButtonClick()
-    {
-#if UNITY_WEBGL
-        return;
-#endif
-        Application.Quit();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#endif
-    }
-
-    private void OnLoadingBarChange(float value)
-    {
-        lodingBarImage.fillAmount = value;
-    }
-
 
     private void OnCreditsBackButtonClick()
     {
+        menuPanel.SetActive(true);
         creditsPanel.SetActive(false);
     }
-
-
-    private void SubscribeButtons()
-    {
-        playButton.onClick.AddListener(OnPlayButtonClick);
-        creditsButton.onClick.AddListener(OnCreditsButtonClick);
-        exitButton.onClick.AddListener(OnExitButtonClick);
-        creditsBackButton.onClick.AddListener(OnCreditsBackButtonClick);
-    }
-
-    private void UnsubscribeButtons()
-    {
-        playButton.onClick.RemoveListener(OnPlayButtonClick);
-        creditsButton.onClick.RemoveListener(OnCreditsButtonClick);
-        exitButton.onClick.RemoveListener(OnExitButtonClick);
-        creditsBackButton.onClick.RemoveListener(OnCreditsBackButtonClick);
-    }
-
 }
