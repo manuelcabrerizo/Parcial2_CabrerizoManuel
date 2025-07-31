@@ -5927,7 +5927,7 @@ ParticleSystemRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: fb2b30f0bbec4574ab947e423e2f73ce, type: 2}
+  - {fileID: 2100000, guid: 676745dc09c3ec846b5647aa45906642, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6417,7 +6417,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac07f2a1c55a5c94491ab3cbdf75eb7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  clips: {fileID: 11400000, guid: c87716e8d7c682b44a0ec1e281f470cf, type: 2}
+  <Clips>k__BackingField: {fileID: 0}
   life: 5
   mana: 1
   damagableMask:

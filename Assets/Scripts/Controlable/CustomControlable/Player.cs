@@ -50,6 +50,7 @@ public class Player : CustomControlable, IDamagable
     {
         Enemy.onEnemySpawn += OnEnemySpawn;
         Controlable.onControlableCreated += OnControlableCreated;
+        Controlable.onControlableBreakFree += OnControlableBreakFree;
 
         ParticleRenderer = AimParticleSystem.GetComponent<ParticleSystemRenderer>();
         SpellParticleRenderer = SpellParticleSystem.GetComponent<ParticleSystemRenderer>();
@@ -72,6 +73,8 @@ public class Player : CustomControlable, IDamagable
     {
         Enemy.onEnemySpawn -= OnEnemySpawn;
         Controlable.onControlableCreated -= OnControlableCreated;
+        Controlable.onControlableBreakFree -= OnControlableBreakFree;
+
 
         StopAllCoroutines();
     }
@@ -112,7 +115,10 @@ public class Player : CustomControlable, IDamagable
         mana = Mathf.Clamp(mana + Time.deltaTime*0.5f, 0.0f, maxMana);
         onManaChange?.Invoke(mana, maxMana);
 
-        PlayAudio();
+        if (controlable)
+        {
+            PlayAudio();
+        }
     }
 
     public override void Initialize(Controlable controlable)
@@ -248,4 +254,15 @@ public class Player : CustomControlable, IDamagable
         }
     }
 
+    private void OnControlableBreakFree(Controlable controlable)
+    {
+        if (controlable.TryGetComponent<Player>(out _))
+        {
+            this.controlable.Data.animator.SetBool("IsGrounded", true);
+            this.controlable.Data.animator.SetBool("IsAiming", false);
+            this.controlable.Data.animator.SetFloat("VelocityX", 0.0f);
+            this.controlable.Data.animator.SetFloat("VelocityZ", 0.0f);
+            this.controlable = null;
+        }
+    }
 }

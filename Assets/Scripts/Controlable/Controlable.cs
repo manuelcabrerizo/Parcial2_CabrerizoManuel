@@ -5,6 +5,7 @@ using UnityEngine;
 public class Controlable : MonoBehaviour
 {
     public static event Action<Controlable> onControlableCreated;
+    public static event Action<Controlable> onControlableBreakFree;
     public ControlableData Data { get; private set; }
     public StateGraph<Controlable> StateGraph { get; private set; }
 
@@ -139,6 +140,7 @@ public class Controlable : MonoBehaviour
 
     public void BreakFree()
     {
+        onControlableBreakFree?.Invoke(this);
         Data.body.useGravity = true;
         Destroy(this);
     }

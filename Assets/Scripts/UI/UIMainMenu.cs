@@ -16,24 +16,19 @@ public class UIMainMenu : MonoBehaviour
     private void Awake()
     {
         Cursor.lockState = CursorLockMode.None;
-        playButton.onClick.AddListener(OnPlayButtonClick);
-        creditsButton.onClick.AddListener(OnCreditsButtonClick);
-        exitButton.onClick.AddListener(OnExitButtonClick);
-        creditsBackButton.onClick.AddListener(OnCreditsBackButtonClick);
+        SubscribeButtons();
         GameSceneManager.onLoadingBarChange += OnLoadingBarChange;
     }
 
     private void OnDestroy()
     {
-        playButton.onClick.RemoveListener(OnPlayButtonClick);
-        creditsButton.onClick.RemoveListener(OnCreditsButtonClick);
-        exitButton.onClick.RemoveListener(OnExitButtonClick);
-        creditsBackButton.onClick.RemoveListener(OnCreditsBackButtonClick);
+        UnsubscribeButtons();
         GameSceneManager.onLoadingBarChange -= OnLoadingBarChange;
     }
 
     private void OnPlayButtonClick()
     {
+        UnsubscribeButtons();
         loadingBar.SetActive(true);
         GameSceneManager.Instance.ChangeSceneTo("Main", LoadSceneMode.Single);
     }
@@ -65,5 +60,21 @@ public class UIMainMenu : MonoBehaviour
         creditsPanel.SetActive(false);
     }
 
+
+    private void SubscribeButtons()
+    {
+        playButton.onClick.AddListener(OnPlayButtonClick);
+        creditsButton.onClick.AddListener(OnCreditsButtonClick);
+        exitButton.onClick.AddListener(OnExitButtonClick);
+        creditsBackButton.onClick.AddListener(OnCreditsBackButtonClick);
+    }
+
+    private void UnsubscribeButtons()
+    {
+        playButton.onClick.RemoveListener(OnPlayButtonClick);
+        creditsButton.onClick.RemoveListener(OnCreditsButtonClick);
+        exitButton.onClick.RemoveListener(OnExitButtonClick);
+        creditsBackButton.onClick.RemoveListener(OnCreditsBackButtonClick);
+    }
 
 }

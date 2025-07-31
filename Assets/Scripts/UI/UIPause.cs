@@ -17,20 +17,14 @@ public class UIPause : MonoBehaviour
     {
         PauseState.onPauseStateEnter += OnPauseStateEnter;
         PauseState.onPauseStateExit += OnPauseStateExit;
-        resumeButton.onClick.AddListener(OnResumeButtonClick);
-        settingsButton.onClick.AddListener(OnSettingsButtonClick);
-        menuButton.onClick.AddListener(OnMenuButtonClick);
-        exitButton.onClick.AddListener(OnExitButtonClick);
+        SubscribeButtons();
     }
 
     private void OnDestroy()
     {
         PauseState.onPauseStateEnter -= OnPauseStateEnter;
         PauseState.onPauseStateExit -= OnPauseStateExit;
-        resumeButton.onClick.RemoveListener(OnResumeButtonClick);
-        settingsButton.onClick.RemoveListener(OnSettingsButtonClick);
-        menuButton.onClick.RemoveListener(OnMenuButtonClick);
-        exitButton.onClick.RemoveListener(OnExitButtonClick);
+        UnsubscribeButtons();
     }
 
     private void OnPauseStateEnter()
@@ -56,6 +50,7 @@ public class UIPause : MonoBehaviour
 
     private void OnMenuButtonClick()
     {
+        UnsubscribeButtons();
         GameSceneManager.Instance.ChangeSceneTo("MainMenu", UnityEngine.SceneManagement.LoadSceneMode.Single);
         GameManager.onShowLoadingBar?.Invoke(true);
     }
@@ -69,5 +64,21 @@ public class UIPause : MonoBehaviour
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
 #endif
+    }
+
+    private void SubscribeButtons()
+    {
+        resumeButton.onClick.AddListener(OnResumeButtonClick);
+        settingsButton.onClick.AddListener(OnSettingsButtonClick);
+        menuButton.onClick.AddListener(OnMenuButtonClick);
+        exitButton.onClick.AddListener(OnExitButtonClick);
+    }
+
+    private void UnsubscribeButtons()
+    {
+        resumeButton.onClick.RemoveListener(OnResumeButtonClick);
+        settingsButton.onClick.RemoveListener(OnSettingsButtonClick);
+        menuButton.onClick.RemoveListener(OnMenuButtonClick);
+        exitButton.onClick.RemoveListener(OnExitButtonClick);
     }
 }

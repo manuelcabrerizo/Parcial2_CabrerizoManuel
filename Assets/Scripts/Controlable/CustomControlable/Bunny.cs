@@ -3,6 +3,16 @@ using UnityEngine;
 
 public class Bunny : CustomControlable
 {
+    private void Awake()
+    {
+        Controlable.onControlableBreakFree += OnControlableBreakFree;
+    }
+
+    private void OnDestroy()
+    {
+        Controlable.onControlableBreakFree -= OnControlableBreakFree;
+    }
+
     public override void Initialize(Controlable controlable)
     {
         ControlableData data = controlable.Data;
@@ -24,5 +34,14 @@ public class Bunny : CustomControlable
         stateGraph.AddBasicStates(basicStates);
         stateGraph.AddAdditiveStates(additiveStates);
         stateGraph.SetInitialState(idleState);
+    }
+
+    private void OnControlableBreakFree(Controlable controlable)
+    {
+        if (controlable.TryGetComponent<Bunny>(out _))
+        {
+            controlable.Data.animator.SetBool("IsGrounded", true);
+            controlable.Data.animator.SetFloat("Velocity", 0.0f);
+        }
     }
 }

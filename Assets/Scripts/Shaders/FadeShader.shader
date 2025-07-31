@@ -6,6 +6,7 @@ Shader "Unlit/FadeShader"
 		_NoiseTex ("Noise", 2D) = "black" {}
 		_Fading ("Fading", Float) = 1.0
 		_ParticleColor ("Particle Color", Color) = (1,1,1,1)
+		_UnscaleTime ("UnscaleTime", Float) = 0
     }
     SubShader
     {
@@ -41,6 +42,7 @@ Shader "Unlit/FadeShader"
             float4 _MainTex_ST;
 			float _Fading;
 			float3 _ParticleColor;
+			float _UnscaleTime;
 
 			float Random(in float2 st)
 			{
@@ -65,7 +67,7 @@ Shader "Unlit/FadeShader"
             float4 frag (v2f i) : SV_Target
             {
 				float2 noiseUv = i.uv;
-				noiseUv.y += _Time.x;
+				noiseUv.y += _UnscaleTime;
 				float4 noise = tex2D(_NoiseTex, noiseUv*0.25f);
 
 				float2 textureUv = i.uv + noise.xy;

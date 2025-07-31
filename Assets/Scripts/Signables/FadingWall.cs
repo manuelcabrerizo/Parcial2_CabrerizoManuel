@@ -25,6 +25,8 @@ public class FadingWall : MonoBehaviour
 
     private void Update()
     {
+        meshRenderer.material.SetFloat("_UnscaleTime", Time.unscaledTime*(0.125f*0.5f));
+
         int count = 0;
         foreach (Signable signable in signables)
         {
