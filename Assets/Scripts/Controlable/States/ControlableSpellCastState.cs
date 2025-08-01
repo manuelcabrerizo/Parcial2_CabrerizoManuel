@@ -120,6 +120,8 @@ public class ControlableSpellCastState : State<Controlable>
         }
 
         ControlableData data = owner.Data;
+        if (data.cam == null) return;
+
         // Cast Spell
         Ray aimRay = data.cam.ScreenPointToRay(new Vector2(data.mousePosX, data.mousePosY));
         RaycastHit hit;

@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.UI.GridLayoutGroup;
 
 public class Player : CustomControlable, IDamagable
 {
@@ -119,6 +120,7 @@ public class Player : CustomControlable, IDamagable
             skinnedMeshRenderer.material.SetColor("_Tint", Color.Lerp(Color.black, Color.red, Mathf.Sin(hitTime * 40)));
         }
 
+        ProcessSpellSound();
         UpdateMana();
 
         if (controlable)
@@ -151,6 +153,14 @@ public class Player : CustomControlable, IDamagable
         stateGraph.AddBasicStates(basicStates);
         stateGraph.AddAdditiveStates(additiveStates);
         stateGraph.SetInitialState(idleState);
+    }
+
+    private void ProcessSpellSound()
+    {
+        if (SpellSound.isPlaying && controlable.IsPause)
+        {
+            SpellSound.Stop();
+        }
     }
 
     private void UpdateMana()

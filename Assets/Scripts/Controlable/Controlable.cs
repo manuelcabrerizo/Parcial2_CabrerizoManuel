@@ -22,7 +22,7 @@ public class Controlable : MonoBehaviour
         PauseState.onPauseStateEnter += OnPauseEnter;
         PauseState.onPauseStateExit += OnPauseExit;
         EndState.onEndStateEnter += OnEndStateEnter;
-        EndState.onEndStateExit += OnEndStateExit;
+        GameManager.onShowLoadingBar += OnShowLoadingBar;
 
         StateGraph = new StateGraph<Controlable>();
         Data = new ControlableData();
@@ -46,7 +46,7 @@ public class Controlable : MonoBehaviour
         PauseState.onPauseStateEnter -= OnPauseEnter;
         PauseState.onPauseStateExit -= OnPauseExit;
         EndState.onEndStateEnter -= OnEndStateEnter;
-        EndState.onEndStateExit -= OnEndStateExit;
+        GameManager.onShowLoadingBar -= OnShowLoadingBar;
     }
 
     private void Update()
@@ -271,8 +271,8 @@ public class Controlable : MonoBehaviour
         isPause = true;
     }
 
-    private void OnEndStateExit()
+    private void OnShowLoadingBar(bool show)
     {
-        isPause = false;
+        isPause = show;
     }
 }

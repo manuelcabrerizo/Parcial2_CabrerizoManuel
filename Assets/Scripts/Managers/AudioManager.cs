@@ -14,8 +14,6 @@ public class AudioManager : MonoBehaviour
     public static Action onPlayMusic;
     public static Action onStopMusic;
     public static Action onPauseMusic;
-    public static Action onPlaySfx;
-    public static Action onStopSfx;
     public static Action<AudioClip, ClipType> onPlayClip;
     public static Action<AudioClip, Vector3, float, float> onPlayClip3D;
 
@@ -37,13 +35,12 @@ public class AudioManager : MonoBehaviour
     {
         UISettings.onMusicSliderChange += OnMusicSliderChange;
         UISettings.onSfxSliderChange += OnSfxSliderChange;
+        UISettings.onUISliderChange += OnUISliderChange;
         onPlayMusic += PlayMusic;
         onStopMusic += StopMusic;
         onPauseMusic += PauseMusic;
         onPlayClip += PlayClip;
         onPlayClip3D += PlayClip3D;
-        onPlaySfx += PlaySfx;
-        onStopSfx += StopSfx;
 
         musicAudioSource = GetComponent<AudioSource>();
         sfxPool = new ObjectPool<AudioSource>(
@@ -61,6 +58,7 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
+        mixer.SetFloat("UIVolume", Utils.LinearToDecibel(volumeData.UI));
         mixer.SetFloat("SfxVolume", Utils.LinearToDecibel(volumeData.Sfx));
         mixer.SetFloat("MusicVolume", Utils.LinearToDecibel(volumeData.Music));
         mixer.SetFloat("MasterVolume", Utils.LinearToDecibel(volumeData.Master));
@@ -70,13 +68,12 @@ public class AudioManager : MonoBehaviour
     {
         UISettings.onMusicSliderChange -= OnMusicSliderChange;
         UISettings.onSfxSliderChange -= OnSfxSliderChange;
+        UISettings.onUISliderChange -= OnUISliderChange;
         onPlayMusic -= PlayMusic;
         onStopMusic -= StopMusic;
         onPauseMusic -= PauseMusic;
         onPlayClip -= PlayClip;
         onPlayClip3D -= PlayClip3D;
-        onPlaySfx -= PlaySfx;
-        onStopSfx -= StopSfx;
 
         StopAllCoroutines();
         sfxPool.Clear();
@@ -96,16 +93,6 @@ public class AudioManager : MonoBehaviour
     private void StopMusic()
     {
         musicAudioSource.Stop();
-    }
-
-    private void PlaySfx()
-    {
-        mixer.SetFloat("SfxVolume", 0);
-    }
-
-    private void StopSfx()
-    {
-        mixer.SetFloat("SfxVolume", -80);
     }
 
     private void PlayClip(AudioClip clip, ClipType type)
@@ -190,16 +177,21 @@ public class AudioManager : MonoBehaviour
     {
         Destroy(pooledObject);
     }
-    
+    private void OnMusicSliderChange(float value)
+    {
+        volumeData.Music = value;
+        mixer.SetFloat("MusicVolume", Utils.LinearToDecibel(volumeData.Music));
+    }
+
     private void OnSfxSliderChange(float value)
     {
         volumeData.Sfx = value;
         mixer.SetFloat("SfxVolume", Utils.LinearToDecibel(volumeData.Sfx));
     }
 
-    private void OnMusicSliderChange(float value)
-    {
-        volumeData.Music = value;
-        mixer.SetFloat("MusicVolume", Utils.LinearToDecibel(volumeData.Music));
+    private void OnUISliderChange(float value)
+    { 
+        volumeData.UI = value;
+        mixer.SetFloat("UIVolume", Utils.LinearToDecibel(volumeData.UI));
     }
 }
