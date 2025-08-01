@@ -9,9 +9,9 @@ public class ControlableHighJumpState : State<Controlable>
     public override void OnEnter()
     {
         ControlableData data = owner.Data;
-        data.body.drag = 0;
+        data.body.drag = owner.DataSo.fallDrag;
         data.body.velocity = new Vector3(data.body.velocity.x, 0.0f, data.body.velocity.z);
-        data.body.AddForce(Vector3.up * 12.0f, ForceMode.Impulse);
+        data.body.AddForce(Vector3.up * owner.DataSo.hightJumpForce, ForceMode.Impulse);
     }
 
     public override void OnFixedUpdate()
@@ -31,13 +31,14 @@ public class ControlableHighJumpState : State<Controlable>
             direction.Normalize();
         }
 
-        data.body.AddForce(direction * 15.0f, ForceMode.Force);
+        data.body.AddForce(direction * owner.DataSo.fallHorizontalSpeed, ForceMode.Force);
 
         Vector3 horizontalVel = data.body.velocity;
         horizontalVel.y = 0;
-        if (horizontalVel.sqrMagnitude > (4.5f * 4.5f))
+        float maxVel = owner.DataSo.fallMaxHorizontalVel;
+        if (horizontalVel.sqrMagnitude > (maxVel * maxVel))
         {
-            horizontalVel = horizontalVel.normalized * 4.5f;
+            horizontalVel = horizontalVel.normalized * maxVel;
         }
         horizontalVel.y = data.body.velocity.y;
         data.body.velocity = horizontalVel;

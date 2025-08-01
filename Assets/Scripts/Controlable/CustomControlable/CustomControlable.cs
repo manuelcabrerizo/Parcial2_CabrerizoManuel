@@ -2,11 +2,12 @@ using UnityEngine;
 
 public abstract class CustomControlable : MonoBehaviour
 {
-    private Animator animator = null;
+    protected Animator animator = null;
     private void Start()
     {
         TryGetComponent(out animator);
         SetAnimatorInitialValues();
+        OnStart();
     }
 
     private void OnEnable()
@@ -24,4 +25,5 @@ public abstract class CustomControlable : MonoBehaviour
     }
 
     public abstract void Initialize(Controlable controlable);
+    protected virtual void OnStart() { }
 }

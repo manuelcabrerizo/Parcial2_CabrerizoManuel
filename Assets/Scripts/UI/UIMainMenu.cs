@@ -6,7 +6,6 @@ public class UIMainMenu : MonoBehaviour
     [SerializeField] private GameObject creditsPanel;
     [SerializeField] private GameObject settingsPanel;
 
-
     private void Awake()
     {
         UIMenu.onSettingsButtonClick += OnSettingsButtonClick;

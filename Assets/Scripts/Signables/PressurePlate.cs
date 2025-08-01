@@ -19,7 +19,7 @@ public class PressurePlate : Signable
     {
         buttonTransform.position = pressPosition;
         isPressed = true;
-        AudioManager.onPlayClip3D(clips.onPressurePlate, transform.position, 10, 40);
+        AudioManager.onPlayClip3D?.Invoke(clips.onPressurePlate, transform.position, 10, 40);
     }
 
     private void OnTriggerStay(Collider other)

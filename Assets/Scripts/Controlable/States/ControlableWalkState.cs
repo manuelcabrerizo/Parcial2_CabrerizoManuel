@@ -3,45 +3,25 @@ using UnityEngine;
 
 public class ControlableWalkState : State<Controlable>
 {
-    private bool sprint = false;
-
     public ControlableWalkState(Controlable controlable, Func<bool> condition) 
         : base(controlable, condition) { }
 
     public override void OnEnter()
     {
         ControlableData data = owner.Data;
-        data.body.drag = 5;
+        data.body.drag = owner.DataSo.normalDrag;
         data.currentJumpDone = 0;
-        sprint = false;
-        if (data.animator != null)
-        {
-            data.animator.SetBool("IsSprinting", sprint);
-        }
-    }
-
-    public override void OnExit()
-    {
-        sprint = false;
-        ControlableData data = owner.Data;
-        if (data.animator != null)
-        {
-            data.animator.SetBool("IsSprinting", sprint);
-        }
     }
 
     public override void OnUpdate()
     {
         ControlableData data = owner.Data;
-
         //sprint = Input.GetKey(KeyCode.LeftShift);
         if (data.animator != null)
         {
             data.animator.SetFloat("VelocityX", data.smoothXInput*0.5f);
             data.animator.SetFloat("VelocityZ", data.smoothYInput*0.5f);
-            data.animator.SetBool("IsSprinting", sprint);
         }
-
     }
 
     public override void OnFixedUpdate()
@@ -61,7 +41,7 @@ public class ControlableWalkState : State<Controlable>
         RaycastHit hit;
         Physics.Raycast(downRay, out hit);
 
-        float speed = sprint ? 80.0f : 40.0f;
+        float speed = owner.DataSo.walkSpeed;
 
         Vector3 normal = hit.normal;
         Plane walkPlane = new Plane(normal, 0);

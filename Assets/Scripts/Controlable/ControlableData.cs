@@ -12,8 +12,7 @@ public class ControlableData
     public float smoothXInput = 0.0f;
     public float smoothYInput = 0.0f;
 
-
-    public int jumpCount = 3;
+    public int jumpCount = 1;
     public int currentJumpDone = 0;
 
     public float moveDirLenSq = 0.0f;

@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 public class Player : CustomControlable, IDamagable
@@ -24,12 +23,14 @@ public class Player : CustomControlable, IDamagable
     [SerializeField] private Material attackMaterial;
     [SerializeField] private SkinnedMeshRenderer skinnedMeshRenderer;
     [SerializeField] private Transform foot;
+    [SerializeField] private AudioSource spellSound;
 
     public int Life => life;
     private int maxLife;
 
     public float Mana => mana;
     private float maxMana;
+    private bool manaFull = true;
 
     private bool isHit = false;
     private float hitTime = 0;
@@ -43,6 +44,7 @@ public class Player : CustomControlable, IDamagable
     public Material IdleMaterial => idleMaterial;
     public Material ControlMaterial => controlMaterial;
     public Material AttackMaterial => attackMaterial;
+    public AudioSource SpellSound => spellSound;
     public ParticleSystemRenderer ParticleRenderer { get; private set; }
     public ParticleSystemRenderer SpellParticleRenderer { get; private set; }
 
@@ -60,13 +62,16 @@ public class Player : CustomControlable, IDamagable
         spellParticleSystem.gameObject.transform.parent = gameObject.transform.parent;
     }
 
-    private void Start()
+    protected override void OnStart()
     {
         maxLife = life;
         onLifeChange?.Invoke(life, maxLife);
 
         maxMana = mana;
         onManaChange?.Invoke(mana, maxMana);
+
+        animator.SetBool("IsAlive", true);
+        animator.SetBool("IsWinner", false);
     }
 
     private void OnDestroy()
@@ -100,6 +105,8 @@ public class Player : CustomControlable, IDamagable
     {
         if (Utils.CheckCollisionLayer(other.gameObject, bookLayer))
         {
+            animator.SetBool("IsWinner", true);
+            other.gameObject.SetActive(false);
             onPlayerWin?.Invoke(this);
         }
     }
@@ -112,8 +119,7 @@ public class Player : CustomControlable, IDamagable
             skinnedMeshRenderer.material.SetColor("_Tint", Color.Lerp(Color.black, Color.red, Mathf.Sin(hitTime * 40)));
         }
 
-        mana = Mathf.Clamp(mana + Time.deltaTime*0.5f, 0.0f, maxMana);
-        onManaChange?.Invoke(mana, maxMana);
+        UpdateMana();
 
         if (controlable)
         {
@@ -147,6 +153,23 @@ public class Player : CustomControlable, IDamagable
         stateGraph.SetInitialState(idleState);
     }
 
+    private void UpdateMana()
+    {
+        mana = Mathf.Clamp(mana + Time.deltaTime * 0.5f, 0.0f, maxMana);
+        onManaChange?.Invoke(mana, maxMana);
+
+        if (mana < maxMana)
+        {
+            manaFull = false;
+        }
+
+        if (manaFull == false && mana >= maxMana)
+        {
+            AudioManager.onPlayClip?.Invoke(Clips.manaFull, ClipType.SFX);
+            manaFull = true;
+        }
+    }
+
     private void OnEnemySpawn(Enemy enemy)
     {
         enemy.SetTarget(transform);
@@ -154,12 +177,13 @@ public class Player : CustomControlable, IDamagable
 
     public void TakeDamage(int amount)
     {
-        AudioManager.onPlayClip3D(Clips.onHit, transform.position, 1, 4);
+        AudioManager.onPlayClip3D?.Invoke(Clips.onHit, transform.position, 1, 4);
         life = Mathf.Max(life - amount, 0);
         onLifeChange?.Invoke(life, maxLife);
         StartCoroutine(HitAnimation(2));
         if (life == 0)
         {
+            animator.SetBool("IsAlive", false);
             onPlayerKill?.Invoke(this);
         }
     }
@@ -183,7 +207,7 @@ public class Player : CustomControlable, IDamagable
     {
         ControlableData data = controlable.Data;
         Vector2 move = new Vector2(data.xInput, data.yInput);
-        if (data.isGrounded && move.magnitude > 0.01f)
+        if (!controlable.IsPause && data.isGrounded && move.magnitude > 0.01f)
         {
             footStepTime += Time.deltaTime;
             if (footStepTime > 0.4f)
@@ -228,11 +252,11 @@ public class Player : CustomControlable, IDamagable
                 case 0: clip = Clips.footSteps[0]; break;
                 case 2: clip = Clips.footSteps[1]; break;
             }
-            AudioManager.onPlayClip3D(clip, foot.position, 1, 4);
+            AudioManager.onPlayClip3D?.Invoke(clip, foot.position, 1, 4);
         }
         else
         {
-            AudioManager.onPlayClip3D(clip, foot.position, 1, 4);
+            AudioManager.onPlayClip3D?.Invoke(clip, foot.position, 1, 4);
         }
     }
 

@@ -1,4 +1,4 @@
-using System;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,6 +12,9 @@ public class UIGameplay : MonoBehaviour
     [SerializeField] private GameObject settingsPanel;
     [SerializeField] private GameObject winPanel;
     [SerializeField] private GameObject gameOverPanel;
+    [SerializeField] private GameObject endPanel;
+
+    [SerializeField] private TextMeshProUGUI endText;
 
     private void Awake()
     {
@@ -29,6 +32,9 @@ public class UIGameplay : MonoBehaviour
 
         GameOverState.onGameOverStateEnter += OnGameOverStateEnter;
         GameOverState.onGameOverStateExit += OnGameOverStateExit;
+
+        EndState.onEndStateEnter += OnEndStateEnter;
+        EndState.onEndStateExit += OnEndStateExit;
     }
 
     private void OnDestroy()
@@ -46,7 +52,10 @@ public class UIGameplay : MonoBehaviour
         WinState.onWinStateExit -= OnWinStateExit;
 
         GameOverState.onGameOverStateEnter -= OnGameOverStateEnter;
-        GameOverState.onGameOverStateExit -= OnGameOverStateExit; 
+        GameOverState.onGameOverStateExit -= OnGameOverStateExit;
+
+        EndState.onEndStateEnter -= OnEndStateEnter;
+        EndState.onEndStateExit -= OnEndStateExit;
     }
 
     private void OnLifeChange(int life, int maxLife)
@@ -62,11 +71,13 @@ public class UIGameplay : MonoBehaviour
     private void OnPauseStateEnter()
     {
         pausePanel.SetActive(true);
+        settingsPanel.SetActive(false);
     }
 
     private void OnPauseStateExit()
     {
         pausePanel.SetActive(false);
+        settingsPanel.SetActive(false);
     }
 
     private void OnSettingsButtonClick()
@@ -99,5 +110,17 @@ public class UIGameplay : MonoBehaviour
     private void OnGameOverStateExit()
     {
         gameOverPanel.SetActive(false);
+    }
+
+    private void OnEndStateEnter(bool isWinner)
+    {
+        endText.text = isWinner ? "Victory" : "Death";
+        endText.color = isWinner ? Color.yellow : Color.red;
+        endPanel.SetActive(true);
+    }
+
+    private void OnEndStateExit()
+    {
+        endPanel.SetActive(false);
     }
 }

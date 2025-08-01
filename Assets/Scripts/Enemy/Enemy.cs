@@ -42,7 +42,7 @@ public class Enemy : MonoBehaviour, IDamagable
 
     public virtual void TakeDamage(int amount)
     {
-        AudioManager.onPlayClip3D(clips.onHit, transform.position, 1, 20);
+        AudioManager.onPlayClip3D?.Invoke(clips.onHit, transform.position, 1, 20);
 
         life = Mathf.Max(life - amount, 0);
         if (life == 0)

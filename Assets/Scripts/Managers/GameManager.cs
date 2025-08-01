@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     public static Action onResetCamera;
     public static Action<bool> onShowLoadingBar;
 
+    private Player player = null;
     private Controlable controlable = null;
     private SceneReferences main = null;
     private string currentLoadedSceneName = null;
@@ -15,9 +16,11 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     private StateMachine fsm;
     private State<GameManager> playingState;
     private State<GameManager> pauseState;
+    private State<GameManager> endState;
     private State<GameManager> gameOverState;
     private State<GameManager> winState;
 
+    public bool IsWinner { get; private set; }
 
     protected override void OnAwaken()
     {
@@ -35,6 +38,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         fsm = new StateMachine();
         playingState = new PlayingState(this);
         pauseState = new PauseState(this);
+        endState = new EndState(this);
         winState = new WinState(this);
         gameOverState = new GameOverState(this);
 
@@ -149,6 +153,11 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
         GameSceneManager.onLoadingCompleted -= OnSceneUnloadingComplete;
     }
 
+    private void OnPlayerCreated(Player player)
+    {
+        this.player = player;
+    }
+
     private void OnControlableCreated(Controlable controlable)
     {
         this.controlable = controlable;
@@ -156,11 +165,13 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     private void OnPlayerWin(Player player)
     {
-        fsm.ChangeState(winState);
+        IsWinner = true;
+        fsm.ChangeState(endState);
     }
 
     private void OnPlayerKill(Player player)
     {
-        fsm.ChangeState(gameOverState);
+        IsWinner = false;
+        fsm.ChangeState(endState);
     }
 }

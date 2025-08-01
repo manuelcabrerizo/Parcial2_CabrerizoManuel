@@ -6417,7 +6417,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac07f2a1c55a5c94491ab3cbdf75eb7a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Clips>k__BackingField: {fileID: 0}
+  <Clips>k__BackingField: {fileID: 11400000, guid: c87716e8d7c682b44a0ec1e281f470cf, type: 2}
   life: 5
   mana: 1
   damagableMask:
@@ -6433,6 +6433,7 @@ MonoBehaviour:
   attackMaterial: {fileID: 2100000, guid: dfc44ea2757cc8d40b37594e2fc1d58f, type: 2}
   skinnedMeshRenderer: {fileID: 7763047208151644554}
   foot: {fileID: 689889399652069339}
+  spellSound: {fileID: 8923716012358448489}
 --- !u!114 &5092473374609590356
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6739,6 +6740,11 @@ Transform:
 --- !u!198 &4491292749771327029 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 1702180453387184303, guid: 8de4cd170535d024a85daa1b612e44cf, type: 3}
+  m_PrefabInstance: {fileID: 3011530391097568922}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &8923716012358448489 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 5916729911631862771, guid: 8de4cd170535d024a85daa1b612e44cf, type: 3}
   m_PrefabInstance: {fileID: 3011530391097568922}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4029855944105256680

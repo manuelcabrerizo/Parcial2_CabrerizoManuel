@@ -9,7 +9,7 @@ public class ControlableFallState : State<Controlable>
     public override void OnEnter()
     {
         ControlableData data = owner.Data;
-        data.body.drag = 0;
+        data.body.drag = owner.DataSo.fallDrag;
     }
 
     public override void OnFixedUpdate()
@@ -29,13 +29,15 @@ public class ControlableFallState : State<Controlable>
             direction.Normalize();
         }
 
-        data.body.AddForce(direction * 15.0f, ForceMode.Force);
+        data.body.AddForce(direction * owner.DataSo.fallHorizontalSpeed, ForceMode.Force);
 
         Vector3 horizontalVel = data.body.velocity;
         horizontalVel.y = 0;
-        if (horizontalVel.sqrMagnitude > (4.5f * 4.5f))
+
+        float maxVel = owner.DataSo.fallMaxHorizontalVel;
+        if (horizontalVel.sqrMagnitude > (maxVel * maxVel))
         {
-            horizontalVel = horizontalVel.normalized * 4.5f;
+            horizontalVel = horizontalVel.normalized * maxVel;
         }
         horizontalVel.y = data.body.velocity.y;
         data.body.velocity = horizontalVel;

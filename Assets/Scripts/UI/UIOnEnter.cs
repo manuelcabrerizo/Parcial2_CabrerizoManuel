@@ -7,6 +7,6 @@ public class UIOnEnter : MonoBehaviour, IPointerEnterHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        AudioManager.onPlayClip?.Invoke(clips.select);
+        AudioManager.onPlayClip?.Invoke(clips.select, ClipType.UI);
     }
 }

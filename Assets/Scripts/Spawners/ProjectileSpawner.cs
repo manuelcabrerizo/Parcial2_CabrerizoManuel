@@ -18,6 +18,11 @@ public class ProjectileSpawner : Spawner<ProjectileSpawner, Projectile>
 
     private void OnProjectileRelease(Projectile projectile)
     {
+        if (PoolManager.Instance == null)
+        {
+            return;
+        }
+
         Projectile test = null;
         if (test = projectile as CrateProjectile)
         {

@@ -21,7 +21,7 @@ public class Ring : Signable
             collision.enabled = false;
             meshRenderer.enabled = false;
             isSignal = true;
-            AudioManager.onPlayClip3D(clips.onRingCatch, transform.position, 10, 40);
+            AudioManager.onPlayClip3D?.Invoke(clips.onRingCatch, transform.position, 10, 40);
         }
     }
 

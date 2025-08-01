@@ -9,7 +9,7 @@ public class ControlableFowardWalkState : State<Controlable>
     public override void OnEnter()
     {
         ControlableData data = owner.Data;
-        data.body.drag = 5;
+        data.body.drag = owner.DataSo.normalDrag;
     }
 
     public override void OnExit()
@@ -42,13 +42,14 @@ public class ControlableFowardWalkState : State<Controlable>
             direction.Normalize();
         }
 
-        data.body.AddForce(direction * 30.0f, ForceMode.Force);
+        data.body.AddForce(direction * owner.DataSo.fowardWalkSpeed, ForceMode.Force);
 
         Vector3 horizontalVel = data.body.velocity;
         horizontalVel.y = 0;
-        if (horizontalVel.sqrMagnitude > (14.0f * 14.0f))
+        float maxVel = owner.DataSo.fowardWalkMaxVelocity;
+        if (horizontalVel.sqrMagnitude > (maxVel * maxVel))
         {
-            horizontalVel = horizontalVel.normalized * 14.0f;
+            horizontalVel = horizontalVel.normalized * maxVel;
         }
         horizontalVel.y = data.body.velocity.y;
         data.body.velocity = horizontalVel;

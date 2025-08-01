@@ -18,6 +18,8 @@ public class SoundClipsSO : ScriptableObject
     public AudioClip onHit;
     public AudioClip onPressurePlate;
     public AudioClip onRingCatch;
+    public AudioClip jump;
+    public AudioClip manaFull;
 
     public AudioClip select;
 }

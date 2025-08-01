@@ -15,7 +15,7 @@ public class PlayerIdleState : State<Controlable>
     public override void OnEnter()
     {
         ControlableData data = owner.Data;
-        data.body.drag = 5;
+        data.body.drag = owner.DataSo.normalDrag;
         data.currentJumpDone = 0;
     }
 

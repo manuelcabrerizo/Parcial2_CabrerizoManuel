@@ -4,25 +4,34 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.Pool;
 
+public enum ClipType
+{ 
+    SFX, UI
+}
+
 public class AudioManager : MonoBehaviour
 {
     public static Action onPlayMusic;
     public static Action onStopMusic;
     public static Action onPauseMusic;
-    public static Action<AudioClip> onPlayClip;
+    public static Action onPlaySfx;
+    public static Action onStopSfx;
+    public static Action<AudioClip, ClipType> onPlayClip;
     public static Action<AudioClip, Vector3, float, float> onPlayClip3D;
 
     [SerializeField] private VolumeDataSO volumeData;
     [SerializeField] private SoundClipsSO soundClips;
 
     [SerializeField] private AudioMixer mixer;
-    [SerializeField] private AudioSource audioSourcePrefab;
+    [SerializeField] private AudioSource audioSourceSfxPrefab;
+    [SerializeField] private AudioSource audioSourceUIPrefab;
     [SerializeField] private bool collectionCheck = true;
     [SerializeField] private int defaultCapacity = 20;
     [SerializeField] private int maxSize = 100;
 
     private AudioSource musicAudioSource;
-    private IObjectPool<AudioSource> pool;
+    private IObjectPool<AudioSource> sfxPool;
+    private IObjectPool<AudioSource> uiPool;
 
     private void Awake()
     {
@@ -33,10 +42,16 @@ public class AudioManager : MonoBehaviour
         onPauseMusic += PauseMusic;
         onPlayClip += PlayClip;
         onPlayClip3D += PlayClip3D;
+        onPlaySfx += PlaySfx;
+        onStopSfx += StopSfx;
 
         musicAudioSource = GetComponent<AudioSource>();
-        pool = new ObjectPool<AudioSource>(
-            CreateAudioSource, OnGetFromPool, OnReleaseToPool, OnDestroyPooledObject,
+        sfxPool = new ObjectPool<AudioSource>(
+            CreateSfxAudioSource, OnGetFromPool, OnReleaseToPool, OnDestroyPooledObject,
+            collectionCheck, defaultCapacity, maxSize);
+
+        uiPool =  new ObjectPool<AudioSource>(
+            CreateUIAudioSource, OnGetFromPool, OnReleaseToPool, OnDestroyPooledObject,
             collectionCheck, defaultCapacity, maxSize);
 
         musicAudioSource.clip = soundClips.music;
@@ -60,9 +75,12 @@ public class AudioManager : MonoBehaviour
         onPauseMusic -= PauseMusic;
         onPlayClip -= PlayClip;
         onPlayClip3D -= PlayClip3D;
+        onPlaySfx -= PlaySfx;
+        onStopSfx -= StopSfx;
 
         StopAllCoroutines();
-        pool.Clear();
+        sfxPool.Clear();
+        uiPool.Clear();
     }
 
     private void PlayMusic()
@@ -80,38 +98,78 @@ public class AudioManager : MonoBehaviour
         musicAudioSource.Stop();
     }
 
-    private void PlayClip(AudioClip clip)
+    private void PlaySfx()
     {
-        AudioSource audioSource = pool.Get();
-        audioSource.transform.position = Vector3.zero;
-        audioSource.spatialBlend = 0.0f;
-        audioSource.clip = clip;
-        audioSource.Play();
-        StartCoroutine(ReleaseAudioSourceIfFinish(audioSource));
+        mixer.SetFloat("SfxVolume", 0);
+    }
+
+    private void StopSfx()
+    {
+        mixer.SetFloat("SfxVolume", -80);
+    }
+
+    private void PlayClip(AudioClip clip, ClipType type)
+    {
+        AudioSource audioSource = null;
+        switch(type)
+        {
+            case ClipType.SFX:
+                { 
+                    audioSource = sfxPool.Get();
+                    audioSource.transform.position = Vector3.zero;
+                    audioSource.spatialBlend = 0.0f;
+                    audioSource.clip = clip;
+                    audioSource.Play();
+                    StartCoroutine(ReleaseSfxAudioSourceIfFinish(audioSource));
+                }
+                break;
+            case ClipType.UI:
+                {
+                    audioSource = uiPool.Get();
+                    audioSource.transform.position = Vector3.zero;
+                    audioSource.spatialBlend = 0.0f;
+                    audioSource.clip = clip;
+                    audioSource.Play();
+                    StartCoroutine(ReleaseUIAudioSourceIfFinish(audioSource));
+                }
+                break;
+        }
     }
 
 
     private void PlayClip3D(AudioClip clip, Vector3 position, float minDist, float maxDist)
     {
-        AudioSource audioSource = pool.Get();
+        AudioSource audioSource = sfxPool.Get();
         audioSource.transform.position = position;
         audioSource.spatialBlend = 1.0f;
         audioSource.minDistance = minDist;
         audioSource.maxDistance = maxDist;
         audioSource.clip = clip;
         audioSource.Play();
-        StartCoroutine(ReleaseAudioSourceIfFinish(audioSource));
+        StartCoroutine(ReleaseSfxAudioSourceIfFinish(audioSource));
     }
 
-    private IEnumerator ReleaseAudioSourceIfFinish(AudioSource audioSource)
+    private IEnumerator ReleaseSfxAudioSourceIfFinish(AudioSource audioSource)
     {
         yield return new WaitForSeconds(audioSource.clip.length);
-        pool.Release(audioSource);
+        sfxPool.Release(audioSource);
     }
 
-    private AudioSource CreateAudioSource()
+    private IEnumerator ReleaseUIAudioSourceIfFinish(AudioSource audioSource)
     {
-        AudioSource audioSource = Instantiate(audioSourcePrefab, transform);
+        yield return new WaitForSecondsRealtime(audioSource.clip.length);
+        uiPool.Release(audioSource);
+    }
+
+    private AudioSource CreateSfxAudioSource()
+    {
+        AudioSource audioSource = Instantiate(audioSourceSfxPrefab, transform);
+        return audioSource;
+    }
+
+    private AudioSource CreateUIAudioSource()
+    {
+        AudioSource audioSource = Instantiate(audioSourceUIPrefab, transform);
         return audioSource;
     }
 

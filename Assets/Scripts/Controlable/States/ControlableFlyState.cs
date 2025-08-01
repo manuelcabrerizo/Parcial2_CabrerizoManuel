@@ -9,7 +9,7 @@ public class ControlableFlyState : State<Controlable>
     public override void OnEnter()
     {
         ControlableData data = owner.Data;
-        data.body.drag = 2.5f;
+        data.body.drag = owner.DataSo.flyDrag;
         data.body.velocity = new Vector3(data.body.velocity.x, 0.0f, data.body.velocity.z);
         data.isGrounded = false;
         // temp fix
@@ -60,12 +60,13 @@ public class ControlableFlyState : State<Controlable>
             direction.Normalize();
         }
 
-        data.body.AddForce(direction * 30.0f, ForceMode.Force);
+        data.body.AddForce(direction * owner.DataSo.flySpeed, ForceMode.Force);
 
         Vector3 velocity = data.body.velocity;
-        if (velocity.sqrMagnitude > (14.0f * 14.0f))
+        float maxVel = owner.DataSo.flyMaxVelocity;
+        if (velocity.sqrMagnitude > (maxVel * maxVel))
         {
-            velocity = velocity.normalized * 14.0f;
+            velocity = velocity.normalized * maxVel;
         }
         data.body.velocity = velocity;
     }

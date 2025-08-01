@@ -8,14 +8,21 @@ public class Controlable : MonoBehaviour
     public static event Action<Controlable> onControlableBreakFree;
     public ControlableData Data { get; private set; }
     public StateGraph<Controlable> StateGraph { get; private set; }
-
+    [field:SerializeField] public ControlableDataSO DataSo { get; set; } 
     [SerializeField] private float maxAngleMovement = 30.0f;
     private LayerMask ignoreGroundRay;
+
+    private bool isPause = false;
+    public bool IsPause => isPause;
 
 
     private void Awake()
     {
         CameraMovement.onCameraCreate += OnCameraCreate;
+        PauseState.onPauseStateEnter += OnPauseEnter;
+        PauseState.onPauseStateExit += OnPauseExit;
+        EndState.onEndStateEnter += OnEndStateEnter;
+        EndState.onEndStateExit += OnEndStateExit;
 
         StateGraph = new StateGraph<Controlable>();
         Data = new ControlableData();
@@ -36,10 +43,16 @@ public class Controlable : MonoBehaviour
     {
         StateGraph.Clear();
         CameraMovement.onCameraCreate -= OnCameraCreate;
+        PauseState.onPauseStateEnter -= OnPauseEnter;
+        PauseState.onPauseStateExit -= OnPauseExit;
+        EndState.onEndStateEnter -= OnEndStateEnter;
+        EndState.onEndStateExit -= OnEndStateExit;
     }
 
     private void Update()
     {
+        if (isPause) return;
+
         ProcessControlableData();
         StateGraph.Update();
         ProcessBreakFree();
@@ -47,11 +60,15 @@ public class Controlable : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (isPause) return;
+
         StateGraph.FixedUpdate();
     }
 
     private void LateUpdate()
     {
+        if (isPause) return;
+
         ProcessRotation();
     }
 
@@ -156,6 +173,7 @@ public class Controlable : MonoBehaviour
                     return;
                 }
                 Controlable newControlable = Data.prevControlable.AddComponent<Controlable>();
+                newControlable.DataSo = DataSo;
                 newControlable.SetPrevControlable(this.gameObject);
                 BreakFree();
             }
@@ -236,5 +254,25 @@ public class Controlable : MonoBehaviour
         return new Vector3((pos.x - terrain.transform.position.x) / terrain.terrainData.size.x,
                            0,
                            (pos.z - terrain.transform.position.z) / terrain.terrainData.size.z);
+    }
+
+    private void OnPauseEnter()
+    { 
+        isPause = true;
+    }
+
+    private void OnPauseExit()
+    { 
+        isPause = false;
+    }
+
+    private void OnEndStateEnter(bool isWinner)
+    {
+        isPause = true;
+    }
+
+    private void OnEndStateExit()
+    {
+        isPause = false;
     }
 }
