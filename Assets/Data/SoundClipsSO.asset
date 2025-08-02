@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: SoundClipsSO
   m_EditorClassIdentifier: 
   music: {fileID: 8300000, guid: b5f1c0a89fdcdce4cb76ce163971e051, type: 3}
+  winMusic: {fileID: 8300000, guid: b8d7eea9bc7d53f4a8f7e6f1db18e05a, type: 3}
+  gameOverMusic: {fileID: 8300000, guid: 4f2c806308a383440a76ec87416179f3, type: 3}
   monsterIdle: {fileID: 8300000, guid: c4699cf01553509409bab70ce258f59a, type: 3}
   monsterHit: {fileID: 8300000, guid: 7acec6b448057d443989e971f47ae266, type: 3}
   monsterAttack: {fileID: 8300000, guid: 4cf0a7b615b8d09419b012326937571b, type: 3}

@@ -13,6 +13,15 @@ public class EndState : State<GameManager>
     {
         onEndStateEnter?.Invoke(owner.IsWinner);
         owner.StartCoroutine(WaitSeconds(10.0f));
+        if (owner.IsWinner)
+        {
+            AudioManager.onSetMusicClip?.Invoke(owner.Clips.winMusic, false);
+        }
+        else
+        {
+            AudioManager.onSetMusicClip?.Invoke(owner.Clips.gameOverMusic, false);
+        }
+        AudioManager.onPlayMusic?.Invoke();
     }
 
     public override void OnExit()

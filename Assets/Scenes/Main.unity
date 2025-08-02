@@ -66845,6 +66845,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GameManager
       objectReference: {fileID: 0}
+    - target: {fileID: 2489935275475997672, guid: 3d70c00eaf6241c43a17131ec1de8e63, type: 3}
+      propertyPath: <Clips>k__BackingField
+      value: 
+      objectReference: {fileID: 11400000, guid: c87716e8d7c682b44a0ec1e281f470cf, type: 2}
     - target: {fileID: 5395163758766583817, guid: 3d70c00eaf6241c43a17131ec1de8e63, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

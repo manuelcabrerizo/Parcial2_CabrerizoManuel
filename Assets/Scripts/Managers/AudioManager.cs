@@ -16,6 +16,7 @@ public class AudioManager : MonoBehaviour
     public static Action onPauseMusic;
     public static Action<AudioClip, ClipType> onPlayClip;
     public static Action<AudioClip, Vector3, float, float> onPlayClip3D;
+    public static Action<AudioClip, bool> onSetMusicClip;
 
     [SerializeField] private VolumeDataSO volumeData;
     [SerializeField] private SoundClipsSO soundClips;
@@ -41,6 +42,7 @@ public class AudioManager : MonoBehaviour
         onPauseMusic += PauseMusic;
         onPlayClip += PlayClip;
         onPlayClip3D += PlayClip3D;
+        onSetMusicClip += SetMusicClip;
 
         musicAudioSource = GetComponent<AudioSource>();
         sfxPool = new ObjectPool<AudioSource>(
@@ -51,8 +53,7 @@ public class AudioManager : MonoBehaviour
             CreateUIAudioSource, OnGetFromPool, OnReleaseToPool, OnDestroyPooledObject,
             collectionCheck, defaultCapacity, maxSize);
 
-        musicAudioSource.clip = soundClips.music;
-        musicAudioSource.loop = true;
+        SetMusicClip(soundClips.music, true);
         musicAudioSource.Stop();
     }
 
@@ -74,6 +75,7 @@ public class AudioManager : MonoBehaviour
         onPauseMusic -= PauseMusic;
         onPlayClip -= PlayClip;
         onPlayClip3D -= PlayClip3D;
+        onSetMusicClip -= SetMusicClip;
 
         StopAllCoroutines();
         sfxPool.Clear();
@@ -134,6 +136,12 @@ public class AudioManager : MonoBehaviour
         audioSource.clip = clip;
         audioSource.Play();
         StartCoroutine(ReleaseSfxAudioSourceIfFinish(audioSource));
+    }
+
+    private void SetMusicClip(AudioClip clip, bool loop)
+    {
+        musicAudioSource.clip = clip;
+        musicAudioSource.loop = loop;
     }
 
     private IEnumerator ReleaseSfxAudioSourceIfFinish(AudioSource audioSource)

@@ -5,6 +5,8 @@ using UnityEngine;
 public class SoundClipsSO : ScriptableObject
 {
     public AudioClip music;
+    public AudioClip winMusic;
+    public AudioClip gameOverMusic;
 
     public AudioClip monsterIdle;
     public AudioClip monsterHit;

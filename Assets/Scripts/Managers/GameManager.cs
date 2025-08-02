@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviourSingleton<GameManager>
 {
+    [field:SerializeField] public SoundClipsSO Clips { get; private set;}
     public static Action onResetCamera;
     public static Action<bool> onShowLoadingBar;
 
