@@ -8,7 +8,6 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     public static Action onResetCamera;
     public static Action<bool> onShowLoadingBar;
 
-    private Player player = null;
     private Controlable controlable = null;
     private SceneReferences main = null;
     private string currentLoadedSceneName = null;
@@ -22,6 +21,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     private State<GameManager> winState;
 
     public bool IsWinner { get; private set; }
+    private bool showingLogingBar = false;
 
     protected override void OnAwaken()
     {
@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && !showingLogingBar)
         { 
             PauseGame();
         }
@@ -121,6 +121,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             currentLoadedSceneName = sceneName;
             this.targetTransform = targetTransform;
             onShowLoadingBar?.Invoke(true);
+            showingLogingBar = true;
         }
     }
 
@@ -134,6 +135,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
             GameSceneManager.onLoadingCompleted += OnSceneUnloadingComplete;
             GameSceneManager.Instance.UnloadScene(currentLoadedSceneName);
             onShowLoadingBar?.Invoke(true);
+            showingLogingBar = true;
         }
     }
 
@@ -141,6 +143,7 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     {
         main.SetActiveGo(false);
         onShowLoadingBar?.Invoke(false);
+        showingLogingBar = false;
         controlable.transform.position = targetTransform.position;
         controlable.transform.rotation = targetTransform.rotation;
         onResetCamera?.Invoke();
@@ -151,12 +154,8 @@ public class GameManager : MonoBehaviourSingleton<GameManager>
     {
         main.SetActiveGo(true);
         onShowLoadingBar?.Invoke(false);
+        showingLogingBar = false;
         GameSceneManager.onLoadingCompleted -= OnSceneUnloadingComplete;
-    }
-
-    private void OnPlayerCreated(Player player)
-    {
-        this.player = player;
     }
 
     private void OnControlableCreated(Controlable controlable)

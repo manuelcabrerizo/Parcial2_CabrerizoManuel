@@ -6,6 +6,7 @@ public class Enemy : MonoBehaviour, IDamagable
     public static event Action<Enemy> onEnemySpawn;
     public static event Action<Enemy> onEnemyKill;
 
+    [SerializeField] public EnemyDataSO data;
     [SerializeField] SoundClipsSO clips;
     [SerializeField] protected float life;
     protected Transform target = null;
@@ -42,7 +43,7 @@ public class Enemy : MonoBehaviour, IDamagable
 
     public virtual void TakeDamage(int amount)
     {
-        AudioManager.onPlayClip3D?.Invoke(clips.onHit, transform.position, 1, 20);
+        AudioManager.onPlayClip3D?.Invoke(clips.onHit, transform.position, data.minSoundRadio, data.maxSoundRadio);
 
         life = Mathf.Max(life - amount, 0);
         if (life == 0)

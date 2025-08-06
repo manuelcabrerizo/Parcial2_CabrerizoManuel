@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class StateGraph<Type>
 {
@@ -111,6 +112,16 @@ public class StateGraph<Type>
                     additiveStateMachine.PopState();
                 }
             }
+        }
+    }
+
+    public void PrintfDebugInfo()
+    { 
+        IState state  = basicStateMachine.PeekState();
+        if (state != null)
+        {
+            Debug.Log("Current State "  + state.GetType());
+
         }
     }
 }

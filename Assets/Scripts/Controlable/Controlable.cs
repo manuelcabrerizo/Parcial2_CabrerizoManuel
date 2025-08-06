@@ -56,6 +56,8 @@ public class Controlable : MonoBehaviour
         ProcessControlableData();
         StateGraph.Update();
         ProcessBreakFree();
+
+        StateGraph.PrintfDebugInfo();
     }
 
     private void FixedUpdate()
@@ -137,7 +139,6 @@ public class Controlable : MonoBehaviour
         {
             Data.animator.SetBool("IsGrounded", Data.isGrounded);
         }
-        //Data.body.useGravity = !Data.isGrounded;
 
         float mouseX = Input.GetAxis("Mouse X");
         float mouseY = Input.GetAxis("Mouse Y");

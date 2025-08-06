@@ -11,7 +11,7 @@ public class BigfootDeadState : State<Bigfoot>
     public override void OnEnter()
     {
         owner.Animator.SetBool("IsDead", true);
-        AudioManager.onPlayClip3D?.Invoke(owner.Clips.monsterDead, owner.transform.position, 1, 20);
+        AudioManager.onPlayClip3D?.Invoke(owner.Clips.monsterDead, owner.transform.position, owner.data.minSoundRadio, owner.data.maxSoundRadio);
     }
 
     public override void OnUpdate()

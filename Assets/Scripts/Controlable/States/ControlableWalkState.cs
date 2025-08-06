@@ -16,7 +16,6 @@ public class ControlableWalkState : State<Controlable>
     public override void OnUpdate()
     {
         ControlableData data = owner.Data;
-        //sprint = Input.GetKey(KeyCode.LeftShift);
         if (data.animator != null)
         {
             data.animator.SetFloat("VelocityX", data.smoothXInput*0.5f);

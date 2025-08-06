@@ -13,7 +13,6 @@ MonoBehaviour:
   m_Name: ControlableDataSO
   m_EditorClassIdentifier: 
   walkSpeed: 50
-  sprintSpeed: 70
   fowardWalkSpeed: 30
   fowardWalkMaxVelocity: 14
   flySpeed: 30

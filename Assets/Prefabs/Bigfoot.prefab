@@ -50,6 +50,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 297508e1ed033ee4c9561644511f9518, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  data: {fileID: 11400000, guid: 9596b140cc0ce2b4eb5d56ad4a7a739c, type: 2}
   clips: {fileID: 11400000, guid: c87716e8d7c682b44a0ec1e281f470cf, type: 2}
   life: 4
   damageMask:
@@ -57,7 +58,6 @@ MonoBehaviour:
     m_Bits: 64
   hand: {fileID: 1710726843308798490}
   <Aim>k__BackingField: {fileID: 977110315053797400}
-  attackRadio: 30
   <Clips>k__BackingField: {fileID: 11400000, guid: c87716e8d7c682b44a0ec1e281f470cf, type: 2}
   <SkinnedMeshRenderer>k__BackingField: {fileID: 665691039335304182}
 --- !u!114 &7630009740349067614

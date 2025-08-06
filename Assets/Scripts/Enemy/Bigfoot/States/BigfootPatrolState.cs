@@ -40,7 +40,7 @@ public class BigfootPatrolState : State<Bigfoot>
         float distance = (owner.transform.position - target.position).magnitude;
         if (distance > 1.0f)
         {
-            owner.Body.AddForce(owner.transform.forward * 10.0f, ForceMode.Acceleration);
+            owner.Body.AddForce(owner.transform.forward * owner.data.walkSpeed, ForceMode.Acceleration);
         }
     }
 

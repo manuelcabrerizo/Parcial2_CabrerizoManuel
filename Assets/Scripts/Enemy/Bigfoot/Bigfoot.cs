@@ -10,10 +10,7 @@ public class Bigfoot : Enemy
     [SerializeField] private LayerMask damageMask;
     [SerializeField] private Transform hand = null;
     [field: SerializeField] public Transform Aim { get; private set; } 
-
-    [SerializeField] private float attackRadio = 4.0f;
     [field:SerializeField] public SoundClipsSO Clips { get; private set; }
-
     [field: SerializeField] public SkinnedMeshRenderer SkinnedMeshRenderer { get; private set; }
 
     private StateGraph<Bigfoot> stateGraph;
@@ -28,7 +25,7 @@ public class Bigfoot : Enemy
 
     public Collider Collision { get; private set; }
 
-    public float AttackRadio => attackRadio;
+    public float AttackRadio => data.attackRadio;
     public float Distance { get; private set; }
 
     public PatrolPoints PatrolPoints { get; private set; }
@@ -163,7 +160,7 @@ public class Bigfoot : Enemy
 
     public void StartRoar()
     {
-        AudioManager.onPlayClip3D?.Invoke(Clips.monsterAttack, transform.position, 1, 20);
+        AudioManager.onPlayClip3D?.Invoke(Clips.monsterAttack, transform.position, data.minSoundRadio, data.maxSoundRadio);
     }
 
     public void Kill()
@@ -182,6 +179,6 @@ public class Bigfoot : Enemy
 
     public void MakeStepSound()
     {
-        AudioManager.onPlayClip3D?.Invoke(Clips.monsterStep, transform.position, 1, 20);
+        AudioManager.onPlayClip3D?.Invoke(Clips.monsterStep, transform.position, data.minSoundRadio, data.maxSoundRadio);
     }
 }
