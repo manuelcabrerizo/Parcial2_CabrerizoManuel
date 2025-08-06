@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fda2a198d0ede84a865a2d55c3f7bcb, type: 3}
   m_Name: ControlableDataSO
   m_EditorClassIdentifier: 
-  walkSpeed: 50
-  fowardWalkSpeed: 30
+  walkSpeed: 100
+  fowardWalkSpeed: 60
   fowardWalkMaxVelocity: 14
   flySpeed: 30
   flyMaxVelocity: 14
   fallHorizontalSpeed: 15
   fallMaxHorizontalVel: 4.5
-  normalDrag: 5
+  normalDrag: 10
   flyDrag: 2.5
   fallDrag: 0
   jumpForce: 8

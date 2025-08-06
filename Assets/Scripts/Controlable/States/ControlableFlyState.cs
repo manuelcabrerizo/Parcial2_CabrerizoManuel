@@ -60,7 +60,7 @@ public class ControlableFlyState : State<Controlable>
             direction.Normalize();
         }
 
-        data.body.AddForce(direction * owner.DataSo.flySpeed, ForceMode.Force);
+        data.body.AddForce(direction * owner.DataSo.flySpeed, ForceMode.Acceleration);
 
         Vector3 velocity = data.body.velocity;
         float maxVel = owner.DataSo.flyMaxVelocity;

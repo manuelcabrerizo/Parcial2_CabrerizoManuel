@@ -52,7 +52,7 @@ public class ControlableWalkState : State<Controlable>
             {
                 direction.Normalize();
             }
-            data.body.AddForce(direction * speed, ForceMode.Force);
+            data.body.AddForce(direction * speed, ForceMode.Acceleration);
         }
     }    
 }

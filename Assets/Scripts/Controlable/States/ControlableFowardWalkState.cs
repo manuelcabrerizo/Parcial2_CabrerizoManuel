@@ -42,7 +42,7 @@ public class ControlableFowardWalkState : State<Controlable>
             direction.Normalize();
         }
 
-        data.body.AddForce(direction * owner.DataSo.fowardWalkSpeed, ForceMode.Force);
+        data.body.AddForce(direction * owner.DataSo.fowardWalkSpeed, ForceMode.Acceleration);
 
         Vector3 horizontalVel = data.body.velocity;
         horizontalVel.y = 0;

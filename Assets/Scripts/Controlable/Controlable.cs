@@ -57,7 +57,7 @@ public class Controlable : MonoBehaviour
         StateGraph.Update();
         ProcessBreakFree();
 
-        StateGraph.PrintfDebugInfo();
+        //StateGraph.PrintfDebugInfo();
     }
 
     private void FixedUpdate()
