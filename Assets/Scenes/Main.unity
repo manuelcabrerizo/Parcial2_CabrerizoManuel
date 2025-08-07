@@ -67081,29 +67081,9 @@ PrefabInstance:
       propertyPath: moveWithCustomTransform
       value: 
       objectReference: {fileID: 963194228}
-    - target: {fileID: 5092473374609590356, guid: ea1f4058b406276419be693e3c54b9d4, type: 3}
-      propertyPath: <DataSo>k__BackingField
-      value: 
-      objectReference: {fileID: 11400000, guid: 4fac6c2fc5c2a8f4582f6878e4d05ef1, type: 2}
     - target: {fileID: 8603545067545536536, guid: ea1f4058b406276419be693e3c54b9d4, type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 8923716012358448489, guid: ea1f4058b406276419be693e3c54b9d4, type: 3}
-      propertyPath: m_Pitch
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8923716012358448489, guid: ea1f4058b406276419be693e3c54b9d4, type: 3}
-      propertyPath: MaxDistance
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 8923716012358448489, guid: ea1f4058b406276419be693e3c54b9d4, type: 3}
-      propertyPath: MinDistance
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8923716012358448489, guid: ea1f4058b406276419be693e3c54b9d4, type: 3}
-      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8960447016187750504, guid: ea1f4058b406276419be693e3c54b9d4, type: 3}
       propertyPath: m_LocalPosition.x

@@ -23,7 +23,7 @@ public class BigfootPatrolState : State<Bigfoot>
     public override void OnUpdate()
     {
         float distance = (owner.transform.position - target.position).magnitude;
-        if (distance <= 1.0f)
+        if (distance <= 10.0f)
         {
             target = owner.PatrolPoints.GetNext();
         }

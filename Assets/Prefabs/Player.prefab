@@ -6446,6 +6446,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27e0af22cf08da74c9260d310a00cf06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <DataSo>k__BackingField: {fileID: 11400000, guid: 4fac6c2fc5c2a8f4582f6878e4d05ef1, type: 2}
   maxAngleMovement: 30
 --- !u!135 &7844329967162003552
 SphereCollider:
@@ -6726,6 +6727,22 @@ PrefabInstance:
     - target: {fileID: 5472907266322241596, guid: 8de4cd170535d024a85daa1b612e44cf, type: 3}
       propertyPath: m_Name
       value: PlayerAim
+      objectReference: {fileID: 0}
+    - target: {fileID: 5916729911631862771, guid: 8de4cd170535d024a85daa1b612e44cf, type: 3}
+      propertyPath: m_Pitch
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 5916729911631862771, guid: 8de4cd170535d024a85daa1b612e44cf, type: 3}
+      propertyPath: MaxDistance
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 5916729911631862771, guid: 8de4cd170535d024a85daa1b612e44cf, type: 3}
+      propertyPath: MinDistance
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5916729911631862771, guid: 8de4cd170535d024a85daa1b612e44cf, type: 3}
+      propertyPath: panLevelCustomCurve.m_Curve.Array.data[0].value
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
